@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>António Salvador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+
+    :root {
+      --green: #00ff88;
+      --green-dim: #00cc6a;
+      --green-glow: rgba(0,255,136,0.18);
+      --green-glow-sm: rgba(0,255,136,0.08);
+      --bg: #050d0a;
+      --bg2: #081410;
+      --surface: rgba(0,255,136,0.04);
+      --surface-hover: rgba(0,255,136,0.09);
+      --border: rgba(0,255,136,0.18);
+      --border-hover: rgba(0,255,136,0.5);
+      --text: #e0ffe8;
+      --text-dim: rgba(224,255,232,0.5);
+      --mono: 'Share Tech Mono', monospace;
+      --sans: 'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      min-height: 100vh;
+      font-family: var(--sans);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── Animated grid background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Radial glow behind profile */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0,255,136,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 48px 20px 60px;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--green-dim);
+    }
+
+    .topbar-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── Avatar ── */
+    .profile-block {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .avatar-wrap {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      margin: 0 auto 16px;
+    }
+
+    .avatar-ring {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1.5px solid var(--green);
+      opacity: 0.35;
+      animation: spin 12s linear infinite;
+    }
+
+    .avatar-ring::before {
+      content: '';
+      position: absolute;
+      top: -3px; left: 50%;
+      transform: translateX(-50%);
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    .avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0d2018, #163028);
+      border: 1.5px solid rgba(0,255,136,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 36px;
+      color: var(--green);
+      text-shadow: 0 0 20px var(--green);
+      letter-spacing: -1px;
+    }
+
+    .profile-name {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .profile-handle {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--green);
+      margin-top: 4px;
+      letter-spacing: 1px;
+    }
+
+    .profile-bio {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      line-height: 1.6;
+      max-width: 340px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── Tags ── */
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--green-dim);
+      background: var(--green-glow-sm);
+      border: 1px solid rgba(0,255,136,0.15);
+      border-radius: 4px;
+      padding: 3px 8px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 24px 0;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(0,255,136,0.3);
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,136,0.2), transparent);
+    }
+
+    /* ── Links ── */
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      text-decoration: none;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      width: 100%;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.25s, border-color 0.25s, transform 0.15s;
+    }
+
+    .link-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--green);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .link-item:hover {
+      background: var(--surface-hover);
+      border-color: var(--border-hover);
+      transform: translateX(3px);
+    }
+
+    .link-item:hover::before {
+      opacity: 1;
+    }
+
+    .link-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      background: var(--green-glow-sm);
+      border: 1px solid rgba(0,255,136,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .link-label {
+      flex: 1;
+    }
+
+    .link-label span {
+      display: block;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 1px;
+      font-weight: 400;
+    }
+
+    .link-arrow {
+      font-size: 14px;
+      color: rgba(0,255,136,0.4);
+      transition: color 0.2s;
+    }
+
+    .link-item:hover .link-arrow {
+      color: var(--green);
+    }
+
+    /* ── Social icons ── */
+    .social-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .social-row a {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      text-decoration: none;
+      color: var(--text);
+      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .social-row a:hover {
+      background: var(--green-glow);
+      border-color: var(--green);
+      box-shadow: 0 0 12px var(--green-glow);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 36px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(0,255,136,0.25);
+    }
+
+    /* ── Modal ── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    #modal-overlay.open { display: flex; }
+
+    #modal {
+      background: #070f0b;
+      border: 1px solid rgba(0,255,136,0.25);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 28px 22px 24px;
+      position: relative;
+      box-shadow: 0 0 40px rgba(0,255,136,0.06);
+    }
+
+    #modal::-webkit-scrollbar { width: 4px; }
+    #modal::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.2); border-radius: 4px; }
+
+    #modal h2 {
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--green);
+      text-align: center;
+      margin-bottom: 22px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    #modal-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: transparent;
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 6px;
+      width: 30px; height: 30px;
+      color: var(--text-dim);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    #modal-close:hover {
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .cert-card {
+      background: rgba(0,255,136,0.03);
+      border: 1px solid rgba(0,255,136,0.1);
+      border-radius: 8px;
+      padding: 13px 15px;
+      margin-bottom: 10px;
+      position: relative;
+      transition: border-color 0.2s;
+    }
+
+    .cert-card:hover { border-color: rgba(0,255,136,0.3); }
+    .cert-card:last-child { margin-bottom: 0; }
+
+    .cert-card::before {
+      content: '▸';
+      position: absolute;
+      left: -1px; top: 13px;
+      color: var(--green);
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .cert-card:hover::before { opacity: 1; }
+
+    .cert-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .cert-issuer {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--green-dim);
+      margin-top: 3px;
+    }
+
+    .cert-date {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .cert-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--green) !important;
+      text-decoration: none;
+      border: 1px solid rgba(0,255,136,0.25);
+      padding: 3px 10px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      letter-spacing: 0.5px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .cert-link:hover {
+      background: var(--green-glow-sm);
+      border-color: var(--green);
+    }
+  </style>
+</head>
+<body>
+
+<div id="wrapper">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <span class="topbar-status">
+      <span class="status-dot"></span>
+      SECURE CONNECTION
+    </span>
+    <span>SEC_ANALYST // PT-BR</span>
+  </div>
+
+  <!-- Profile -->
+  <div class="profile-block">
+    <div class="avatar-wrap">
+      <div class="avatar-ring"></div>
+      <div class="avatar">AS</div>
+    </div>
+    <div class="profile-name">António Salvador</div>
+    <div class="profile-handle">[ @antoniojrms ]</div>
+    <div class="profile-bio">Analista de Segurança da Informação · Infraestrutura · Redes</div>
+    <div class="tags">
+      <span class="tag">INFOSEC</span>
+      <span class="tag">ETHICAL HACKING</span>
+      <span class="tag">LINUX</span>
+      <span class="tag">NETWORKING</span>
+      <span class="tag">BLUE TEAM</span>
+    </div>
+  </div>
+
+  <div class="divider">// LINKS //</div>
+
+  <!-- Links -->
+  <div class="links">
+    <a class="link-item" href="https://www.linkedin.com/in/antoniojrms/" target="_blank">
+      <div class="link-icon">💼</div>
+      <div class="link-label">LinkedIn<span>Perfil profissional</span></div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-item" href="https://github.com/AntoniojoseRMS" target="_blank">
+      <div class="link-icon">🐙</div>
+      <div class="link-label">GitHub<span>Repositórios e projetos</span></div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-item" href="mailto:antoniojmoraissalvador@gmail.com">
+      <div class="link-icon">✉️</div>
+      <div class="link-label">E-mail<span>antoniojmoraissalvador@gmail.com</span></div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-item" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank">
+      <div class="link-icon">💬</div>
+      <div class="link-label">WhatsApp<span>+55 51 99170-7737</span></div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <a class="link-item" href="https://instagram.com/Antoniojrms" target="_blank">
+      <div class="link-icon">📸</div>
+      <div class="link-label">Instagram<span>@Antoniojrms</span></div>
+      <span class="link-arrow">→</span>
+    </a>
+
+    <button class="link-item" onclick="openModal()">
+      <div class="link-icon">🏅</div>
+      <div class="link-label">Certificações<span>10 licenças e certificados</span></div>
+      <span class="link-arrow">→</span>
+    </button>
+  </div>
+
+  <!-- Social icons -->
+  <div class="social-row">
+    <a href="https://www.linkedin.com/in/antoniojrms/" target="_blank" title="LinkedIn">
+      <ion-icon name="logo-linkedin"></ion-icon>
+    </a>
+    <a href="https://github.com/AntoniojoseRMS" target="_blank" title="GitHub">
+      <ion-icon name="logo-github"></ion-icon>
+    </a>
+    <a href="mailto:antoniojmoraissalvador@gmail.com" title="E-mail">
+      <ion-icon name="mail-outline"></ion-icon>
+    </a>
+    <a href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank" title="WhatsApp">
+      <ion-icon name="logo-whatsapp"></ion-icon>
+    </a>
+    <a href="https://instagram.com/Antoniojrms" target="_blank" title="Instagram">
+      <ion-icon name="logo-instagram"></ion-icon>
+    </a>
+  </div>
+
+  <footer>// © 2026 ANTÓNIO SALVADOR · INFOSEC //</footer>
+</div>
+
+<!-- Modal Certificações -->
+<div id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div id="modal">
+    <button id="modal-close" onclick="closeModal()">✕</button>
+    <h2>// Certificações //</h2>
+
+    <div class="cert-card">
+      <div class="cert-name">Nexthink Associate</div>
+      <div class="cert-issuer">Nexthink</div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">IT Support Associate</div>
+      <div class="cert-issuer">Nexthink</div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">IT Support Professional</div>
+      <div class="cert-issuer">Nexthink</div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">CRPO — Certified Ransomware Protection Officer</div>
+      <div class="cert-issuer">ICTTF - United for Digital Resilience</div>
+      <div class="cert-date">Emitida em fev. 2026 · Código: 64d63660ac9488bbf50f3e76</div>
+      <a class="cert-link" href="https://mycourse.app/cuewiFxSN4aozzbr1" target="_blank">▸ VER CREDENCIAL</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">Introduction to Cybersecurity</div>
+      <div class="cert-issuer">Cisco</div>
+      <div class="cert-date">Emitida em fev. 2026</div>
+      <a class="cert-link" href="https://www.credly.com/badges/b3bd9674-3b27-4a63-b90f-cad1fb4c59a2/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">Segurança em Linux</div>
+      <div class="cert-issuer">IBSEC - Instituto Brasileiro de Cibersegurança</div>
+      <div class="cert-date">Emitida em fev. 2026</div>
+      <a class="cert-link" href="https://certs.ibsec.com.br?cert_hash=c9966ec4d0b375a0" target="_blank">▸ VER CREDENCIAL</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">Getting Started in Cybersecurity 3.0</div>
+      <div class="cert-issuer">Fortinet</div>
+      <div class="cert-date">Emitida em fev. 2026</div>
+      <a class="cert-link" href="https://www.credly.com/badges/13ec5088-ef79-4844-a36c-31bb2120385e/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">Introdução ao Sistema Operacional Linux</div>
+      <div class="cert-issuer">Udemy</div>
+      <div class="cert-date">Emitida em jan. 2026</div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">Hacker Ético Profissional com Kali Linux v2023</div>
+      <div class="cert-issuer">Udemy</div>
+      <div class="cert-date">Emitida em mai. 2023</div>
+    </div>
+
+    <div class="cert-card">
+      <div class="cert-name">Redes TCP/IP</div>
+      <div class="cert-issuer">Udemy</div>
+      <div class="cert-date">Emitida em mai. 2022</div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script>
+  function openModal() {
+    document.getElementById("modal-overlay").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal() {
+    document.getElementById("modal-overlay").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById("modal-overlay")) closeModal();
+  }
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+</script>
+</body>
+</html>
