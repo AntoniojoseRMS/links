@@ -483,6 +483,70 @@
       z-index: 0;
     }
 
+    /* ── PROJECT CARDS ── */
+    .proj-card {
+      background: rgba(0,255,136,.025);
+      border: 1px solid rgba(0,255,136,.1);
+      border-radius: 7px;
+      padding: 14px 15px;
+      margin-bottom: 10px;
+      transition: border-color .2s, background .2s;
+    }
+    .proj-card:hover { border-color: rgba(0,255,136,.3); background: rgba(0,255,136,.04); }
+    .proj-card:last-child { margin-bottom: 0; }
+
+    .proj-top { display: flex; align-items: flex-start; gap: 10px; }
+    .proj-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+    .proj-info { flex: 1; min-width: 0; }
+    .proj-name { font-size: 14px; font-weight: 600; color: #fff; font-family: 'Inter', var(--mono); }
+    .proj-desc { font-size: 11px; color: var(--td); margin-top: 3px; line-height: 1.5; }
+
+    .proj-meta { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .proj-lang {
+      font-size: 10px;
+      color: var(--gc);
+      background: rgba(0,255,136,.07);
+      border: 1px solid rgba(0,255,136,.15);
+      border-radius: 3px;
+      padding: 2px 8px;
+      letter-spacing: .5px;
+    }
+    .proj-lang.html { color: #e34c26; border-color: rgba(227,76,38,.3); background: rgba(227,76,38,.07); }
+    .proj-lang.js   { color: #f7df1e; border-color: rgba(247,223,30,.3); background: rgba(247,223,30,.07); }
+    .proj-lang.py   { color: #3572a5; border-color: rgba(53,114,165,.3); background: rgba(53,114,165,.07); }
+    .proj-lang.css  { color: #563d7c; border-color: rgba(86,61,124,.3); background: rgba(86,61,124,.07); }
+
+    .proj-btns { display: flex; gap: 7px; margin-top: 11px; flex-wrap: wrap; }
+    .proj-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-family: var(--mono);
+      letter-spacing: .5px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: background .2s, border-color .2s;
+    }
+    .proj-btn.gh {
+      color: var(--t);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .proj-btn.gh:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.25); }
+    .proj-btn.live {
+      color: var(--bg);
+      background: var(--g);
+      font-weight: 600;
+    }
+    .proj-btn.live:hover { background: #00e87a; }
+
+    .proj-loading { text-align: center; padding: 30px; color: var(--td); font-size: 12px; }
+    .proj-loading::after { content: ''; animation: bd .8s infinite; display: inline-block; margin-left: 4px; color: var(--g); }
+
     @media(max-width:500px) {
       .lf { display: none; }
       #gname { font-size: 16px; letter-spacing: 2px; }
@@ -622,6 +686,15 @@
     <span class="li-arr">›</span>
   </button>
 
+  <button class="li" onclick="openM('proj')">
+    <div class="li-ico">🖥️</div>
+    <div class="li-txt">
+      <div class="li-name">Projetos</div>
+      <div class="li-sub">Repositórios públicos no GitHub</div>
+    </div>
+    <span class="li-arr">›</span>
+  </button>
+
   <!-- SOCIAL ICONS -->
   <div id="socials">
     <a href="https://www.linkedin.com/in/antoniojrms/" target="_blank" title="LinkedIn">
@@ -724,6 +797,15 @@
       <div class="cd">Jan 2021 – Jul 2023 · Bacharelado · Concluído</div>
       <a class="cl" href="https://antoniojoserms.github.io/links/ADS.pdf" target="_blank">▸ VER CERTIFICADO</a>
     </div>
+  </div>
+</div>
+
+<!-- MODAL PROJETOS -->
+<div id="m-proj" class="mov" onclick="overlayClick(event,'proj')">
+  <div class="mbox">
+    <button class="mc" onclick="closeM('proj')">✕</button>
+    <div class="mt">// Projetos no GitHub //</div>
+    <div id="proj-list"><div class="proj-loading">Carregando projetos</div></div>
   </div>
 </div>
 
@@ -1008,6 +1090,70 @@ tin.addEventListener('keydown', e => {
 });
 
 document.getElementById('term').addEventListener('click', () => tin.focus());
+
+/* ── PROJETOS ── */
+const PROJ_ICONS = { HTML:'🌐', JavaScript:'⚡', Python:'🐍', CSS:'🎨', Java:'☕', 'C++':'⚙️', TypeScript:'💙', Shell:'🖥️' };
+const PROJ_SKIP = ['links']; // repo da própria página
+
+let projLoaded = false;
+
+async function loadProjects() {
+  if (projLoaded) return;
+  const el = document.getElementById('proj-list');
+  try {
+    const res = await fetch('https://api.github.com/users/AntoniojoseRMS/repos?per_page=100&sort=updated');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const repos = await res.json();
+
+    const filtered = repos.filter(r => !r.fork && !PROJ_SKIP.includes(r.name) && !r.archived);
+
+    if (!filtered.length) {
+      el.innerHTML = '<div class="proj-loading">Nenhum projeto encontrado.</div>';
+      return;
+    }
+
+    el.innerHTML = filtered.map(r => {
+      const lang = r.language || '';
+      const langClass = lang.toLowerCase().replace(/[^a-z]/g,'');
+      const icon = PROJ_ICONS[lang] || '📁';
+      const desc = r.description || 'Sem descrição.';
+      const ghUrl = r.html_url;
+      const pagesUrl = r.has_pages ? `https://antoniojoserms.github.io/${r.name}/` : null;
+      const name = r.name.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+      const updated = new Date(r.updated_at).toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
+
+      return `<div class="proj-card">
+        <div class="proj-top">
+          <div class="proj-icon">${icon}</div>
+          <div class="proj-info">
+            <div class="proj-name">${name}</div>
+            <div class="proj-desc">${desc}</div>
+          </div>
+        </div>
+        <div class="proj-meta">
+          ${lang ? `<span class="proj-lang ${langClass}">${lang}</span>` : ''}
+          <span style="font-size:10px;color:var(--td);">Atualizado: ${updated}</span>
+          ${r.stargazers_count > 0 ? `<span style="font-size:10px;color:var(--td);">⭐ ${r.stargazers_count}</span>` : ''}
+        </div>
+        <div class="proj-btns">
+          <a class="proj-btn gh" href="${ghUrl}" target="_blank">⌥ Ver Código</a>
+          ${pagesUrl ? `<a class="proj-btn live" href="${pagesUrl}" target="_blank">▶ Ver ao Vivo</a>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    projLoaded = true;
+  } catch(e) {
+    el.innerHTML = `<div class="proj-loading">Erro ao carregar projetos.<br><span style="color:var(--r);font-size:10px;">${e.message}</span></div>`;
+  }
+}
+
+// intercept openM para carregar projetos ao abrir
+const _openM = openM;
+window.openM = function(id) {
+  _openM(id);
+  if (id === 'proj') loadProjects();
+};
 </script>
 </body>
 </html>
