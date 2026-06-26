@@ -1,553 +1,585 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>António Salvador</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>António Salvador // INFOSEC</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after {
-      margin: 0; padding: 0; box-sizing: border-box;
-    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --green: #00ff88;
-      --green-dim: #00cc6a;
-      --green-glow: rgba(0,255,136,0.18);
-      --green-glow-sm: rgba(0,255,136,0.08);
+      --g:  #00ff88;
+      --gc: #00cc6a;
+      --c:  #00e5ff;
+      --r:  #ff4466;
       --bg: #050d0a;
-      --bg2: #081410;
-      --surface: rgba(0,255,136,0.04);
-      --surface-hover: rgba(0,255,136,0.09);
-      --border: rgba(0,255,136,0.18);
-      --border-hover: rgba(0,255,136,0.5);
-      --text: #e0ffe8;
-      --text-dim: rgba(224,255,232,0.5);
+      --s:  rgba(0,255,136,0.04);
+      --sh: rgba(0,255,136,0.09);
+      --b:  rgba(0,255,136,0.15);
+      --bh: rgba(0,255,136,0.55);
+      --t:  #e0ffe8;
+      --td: rgba(224,255,232,0.42);
       --mono: 'Share Tech Mono', monospace;
-      --sans: 'Inter', sans-serif;
+      --orb:  'Orbitron', sans-serif;
     }
 
     body {
       background: var(--bg);
       min-height: 100vh;
-      font-family: var(--sans);
-      color: var(--text);
+      font-family: var(--mono);
+      color: var(--t);
       overflow-x: hidden;
     }
 
-    /* ── Animated grid background ── */
-    body::before {
-      content: '';
+    /* ── MATRIX CANVAS ── */
+    #mx {
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(0,255,136,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,136,0.04) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
       z-index: 0;
+      opacity: 0.13;
+      pointer-events: none;
+      transition: opacity 0.6s;
     }
 
-    /* Radial glow behind profile */
-    body::after {
-      content: '';
+    /* ── SCANLINES ── */
+    #sl {
       position: fixed;
-      top: -120px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(0,255,136,0.07) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    #wrapper {
-      position: relative;
+      inset: 0;
       z-index: 1;
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 48px 20px 60px;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent 0px, transparent 2px,
+        rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+      );
     }
 
-    /* ── Top bar ── */
-    .topbar {
+    /* ── BOOT SCREEN ── */
+    #boot {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: clamp(24px, 5vw, 60px);
+      font-size: 13px;
+      color: var(--g);
+      transition: opacity 0.5s;
+    }
+    #boot.out { opacity: 0; pointer-events: none; }
+    #boot-text { line-height: 1.9; white-space: pre-wrap; max-width: 560px; }
+    #boot-bar { width: 280px; height: 2px; background: rgba(0,255,136,.15); margin-top: 18px; border-radius: 2px; overflow: hidden; }
+    #boot-fill { height: 100%; width: 0%; background: var(--g); box-shadow: 0 0 10px var(--g); transition: width .08s; }
+    #boot-skip { margin-top: 18px; background: transparent; border: 1px solid rgba(0,255,136,.25); color: var(--td); font-family: var(--mono); font-size: 11px; padding: 4px 14px; cursor: pointer; border-radius: 3px; letter-spacing: 1px; }
+    #boot-skip:hover { border-color: var(--g); color: var(--g); }
+
+    /* ── WRAPPER ── */
+    #wrap {
+      position: relative;
+      z-index: 2;
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 0 20px 70px;
+    }
+
+    /* ── TOP BAR ── */
+    #topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 40px;
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--green-dim);
+      padding: 14px 0;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--gc);
+      border-bottom: 1px solid rgba(0,255,136,.07);
+      margin-bottom: 44px;
     }
-
-    .topbar-status {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-dot {
-      width: 7px; height: 7px;
+    .blink-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
       border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 6px var(--green);
-      animation: pulse 2s infinite;
+      background: var(--g);
+      box-shadow: 0 0 7px var(--g);
+      margin-right: 5px;
+      animation: bd 1.4s infinite;
     }
+    @keyframes bd { 0%,100%{opacity:1} 50%{opacity:.15} }
+    #topbar-r { display: flex; gap: 20px; align-items: center; }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+    /* ── PROFILE ── */
+    #profile { text-align: center; margin-bottom: 44px; }
 
-    /* ── Avatar ── */
-    .profile-block {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .avatar-wrap {
+    /* Avatar */
+    #av-wrap {
       position: relative;
-      width: 110px;
-      height: 110px;
-      margin: 0 auto 16px;
+      width: 134px; height: 134px;
+      margin: 0 auto 22px;
     }
-
-    .avatar-ring {
+    .ring {
       position: absolute;
-      inset: -6px;
       border-radius: 50%;
-      border: 1.5px solid var(--green);
-      opacity: 0.35;
-      animation: spin 12s linear infinite;
     }
-
-    .avatar-ring::before {
+    .r1 {
+      inset: -10px;
+      border: 1px dashed rgba(0,255,136,.55);
+      animation: spin 9s linear infinite;
+    }
+    .r1::before {
       content: '';
       position: absolute;
-      top: -3px; left: 50%;
-      transform: translateX(-50%);
       width: 8px; height: 8px;
       border-radius: 50%;
-      background: var(--green);
-      box-shadow: 0 0 8px var(--green);
+      top: -4px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--g);
+      box-shadow: 0 0 10px var(--g), 0 0 20px var(--g);
     }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
+    .r2 {
+      inset: -22px;
+      border: 1px solid rgba(0,229,255,.2);
+      animation: spin 18s linear infinite reverse;
     }
-
-    .avatar {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0d2018, #163028);
-      border: 1.5px solid rgba(0,255,136,0.3);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--mono);
-      font-size: 36px;
-      color: var(--green);
-      text-shadow: 0 0 20px var(--green);
-      letter-spacing: -1px;
-    }
-
-    .profile-name {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      color: #fff;
-    }
-
-    .profile-handle {
-      font-family: var(--mono);
-      font-size: 12px;
-      color: var(--green);
-      margin-top: 4px;
-      letter-spacing: 1px;
-    }
-
-    .profile-bio {
-      font-size: 12px;
-      color: var(--text-dim);
-      margin-top: 8px;
-      line-height: 1.6;
-      max-width: 340px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* ── Tags ── */
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      justify-content: center;
-      margin-top: 14px;
-    }
-
-    .tag {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--green-dim);
-      background: var(--green-glow-sm);
-      border: 1px solid rgba(0,255,136,0.15);
-      border-radius: 4px;
-      padding: 3px 8px;
-      letter-spacing: 0.5px;
-    }
-
-    /* ── Divider ── */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 24px 0;
-      font-family: var(--mono);
-      font-size: 10px;
-      color: rgba(0,255,136,0.3);
-    }
-
-    .divider::before, .divider::after {
+    .r2::before {
       content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(0,255,136,0.2), transparent);
+      position: absolute;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      bottom: -3px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--c);
+      box-shadow: 0 0 8px var(--c);
     }
-
-    /* ── Links ── */
-    .links {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .r3 {
+      inset: -34px;
+      border: 1px solid rgba(0,255,136,.08);
+      animation: spin 32s linear infinite;
     }
+    @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
 
-    .link-item {
+    #av {
+      width: 134px; height: 134px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #1a3d25, #0a1a12 70%, #050d0a);
+      border: 2px solid rgba(0,255,136,.35);
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 14px 20px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      text-decoration: none;
-      cursor: pointer;
-      font-family: var(--sans);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text);
-      width: 100%;
-      text-align: left;
+      justify-content: center;
+      font-family: var(--orb);
+      font-size: 44px;
+      font-weight: 900;
+      color: var(--g);
+      text-shadow: 0 0 24px var(--g), 0 0 60px rgba(0,255,136,.25);
+      letter-spacing: -2px;
       position: relative;
       overflow: hidden;
-      transition: background 0.25s, border-color 0.25s, transform 0.15s;
+      box-shadow: 0 0 40px rgba(0,255,136,.07), inset 0 0 30px rgba(0,0,0,.5);
+    }
+    /* Scan beam */
+    #av::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,136,.8), transparent);
+      box-shadow: 0 0 12px var(--g);
+      animation: scan 3.5s ease-in-out infinite;
+    }
+    @keyframes scan { 0%{top:-4px;opacity:0} 8%{opacity:1} 92%{opacity:1} 100%{top:134px;opacity:0} }
+
+    /* ── GLITCH NAME ── */
+    #gname {
+      font-family: var(--orb);
+      font-size: clamp(18px, 4.5vw, 24px);
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #fff;
+      text-transform: uppercase;
+      display: inline-block;
+      position: relative;
+      text-shadow: 0 0 20px rgba(255,255,255,.2);
+    }
+    #gname::before, #gname::after {
+      content: attr(data-t);
+      position: absolute;
+      top: 0; left: 0; width: 100%;
+    }
+    #gname::before {
+      color: var(--c);
+      animation: g1 5s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 38%, 0 38%);
+    }
+    #gname::after {
+      color: var(--r);
+      animation: g2 5s infinite;
+      clip-path: polygon(0 62%, 100% 62%, 100% 100%, 0 100%);
+    }
+    @keyframes g1 {
+      0%,82%,100%{transform:translate(0);opacity:0}
+      83%{transform:translate(-4px,1px);opacity:.9}
+      85%{transform:translate(4px,-1px);opacity:.9}
+      87%{transform:translate(0);opacity:0}
+      89%{transform:translate(-2px,0);opacity:.7}
+      91%{transform:translate(0);opacity:0}
+    }
+    @keyframes g2 {
+      0%,82%,100%{transform:translate(0);opacity:0}
+      84%{transform:translate(4px,2px);opacity:.7}
+      86%{transform:translate(-3px,-1px);opacity:.7}
+      88%{transform:translate(0);opacity:0}
+      90%{transform:translate(2px,1px);opacity:.5}
+      92%{transform:translate(0);opacity:0}
     }
 
-    .link-item::before {
+    /* ── TYPED ROLE ── */
+    #role {
+      font-size: 12px;
+      color: var(--g);
+      margin-top: 8px;
+      letter-spacing: 2px;
+      min-height: 18px;
+    }
+    #role::after { content: '█'; animation: bd .8s infinite; margin-left: 2px; color: var(--g); }
+
+    /* ── STATS ── */
+    #stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0 14px;
+      font-size: 10px;
+      flex-wrap: wrap;
+    }
+    .stat { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; background: rgba(0,255,136,.03); border: 1px solid rgba(0,255,136,.1); border-radius: 4px; }
+    .sl { font-size: 8px; color: var(--td); letter-spacing: 1px; }
+    .sv { font-size: 12px; }
+    .sv.g { color: var(--g); text-shadow: 0 0 8px var(--g); }
+    .sv.c { color: var(--c); text-shadow: 0 0 8px var(--c); }
+
+    /* ── TAGS ── */
+    #tags { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; margin-top: 12px; }
+    .tag { font-size: 9px; color: var(--gc); background: rgba(0,255,136,.05); border: 1px solid rgba(0,255,136,.14); border-radius: 3px; padding: 3px 8px; letter-spacing: .8px; }
+
+    /* ── SECTION LABEL ── */
+    .sec {
+      font-size: 9px;
+      letter-spacing: 3px;
+      color: rgba(0,255,136,.35);
+      margin: 34px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sec::before, .sec::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,255,136,.18), transparent); }
+
+    /* ── LINK ITEMS ── */
+    .li {
+      display: flex;
+      align-items: center;
+      padding: 11px 14px;
+      background: rgba(0,255,136,.025);
+      border: 1px solid rgba(0,255,136,.1);
+      border-radius: 5px;
+      text-decoration: none;
+      cursor: pointer;
+      color: var(--t);
+      width: 100%;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 12px;
+      margin-bottom: 7px;
+      position: relative;
+      overflow: hidden;
+      transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
+      outline: none;
+    }
+    .li::before {
       content: '';
       position: absolute;
       left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: var(--green);
-      opacity: 0;
-      transition: opacity 0.25s;
+      width: 2px;
+      background: var(--g);
+      box-shadow: 0 0 12px var(--g);
+      transform: scaleY(0);
+      transition: transform .2s;
     }
-
-    .link-item:hover {
-      background: var(--surface-hover);
-      border-color: var(--border-hover);
-      transform: translateX(3px);
+    .li:hover, .li:focus {
+      background: rgba(0,255,136,.065);
+      border-color: rgba(0,255,136,.35);
+      transform: translateX(5px);
+      box-shadow: -5px 0 25px rgba(0,255,136,.04);
     }
-
-    .link-item:hover::before {
-      opacity: 1;
+    .li:hover::before, .li:focus::before { transform: scaleY(1); }
+    /* shimmer */
+    .li::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(0,255,136,.04), transparent);
+      transform: translateX(-100%);
+      transition: transform .6s;
     }
+    .li:hover::after { transform: translateX(100%); }
 
-    .link-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 6px;
-      background: var(--green-glow-sm);
-      border: 1px solid rgba(0,255,136,0.15);
+    .lp { color: var(--gc); margin-right: 6px; flex-shrink: 0; font-size: 11px; }
+    .lc { color: var(--g); margin-right: 4px; flex-shrink: 0; }
+    .lf { color: rgba(0,229,255,.65); flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .lic { color: rgba(0,255,136,.3); transition: color .2s, transform .2s; font-size: 13px; margin-left: 8px; flex-shrink: 0; }
+    .li:hover .lic { color: var(--g); transform: translateX(3px); }
+
+    /* ── MINI TERMINAL ── */
+    #term {
+      margin-top: 8px;
+      border: 1px solid rgba(0,255,136,.18);
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(2,8,5,.95);
+      box-shadow: 0 0 40px rgba(0,255,136,.04), inset 0 0 40px rgba(0,0,0,.4);
+    }
+    #th {
+      background: rgba(0,255,136,.07);
+      border-bottom: 1px solid rgba(0,255,136,.12);
+      padding: 8px 12px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--td);
     }
-
-    .link-label {
+    .td { width: 11px; height: 11px; border-radius: 50%; }
+    .tdr { background: #ff5f57; }
+    .tdy { background: #ffbd2e; }
+    .tdg { background: #28c941; }
+    #to {
+      padding: 12px 14px;
+      font-size: 12px;
+      line-height: 1.75;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    #to::-webkit-scrollbar { width: 3px; }
+    #to::-webkit-scrollbar-thumb { background: rgba(0,255,136,.18); }
+    .tl.cmd { color: var(--g); }
+    .tl.info { color: var(--td); }
+    .tl.ok { color: #28c941; }
+    .tl.err { color: #ff5f57; }
+    .tl.cy { color: var(--c); }
+    .tl.hd { color: var(--g); font-size: 10px; letter-spacing: 1px; }
+    #tir {
+      display: flex;
+      align-items: center;
+      padding: 9px 14px;
+      border-top: 1px solid rgba(0,255,136,.09);
+      gap: 6px;
+    }
+    #tip { color: var(--g); font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+    #tin {
       flex: 1;
-    }
-
-    .link-label span {
-      display: block;
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-top: 1px;
-      font-weight: 400;
-    }
-
-    .link-arrow {
-      font-size: 14px;
-      color: rgba(0,255,136,0.4);
-      transition: color 0.2s;
-    }
-
-    .link-item:hover .link-arrow {
-      color: var(--green);
-    }
-
-    /* ── Social icons ── */
-    .social-row {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 28px;
-    }
-
-    .social-row a {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      text-decoration: none;
-      color: var(--text);
-      transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .social-row a:hover {
-      background: var(--green-glow);
-      border-color: var(--green);
-      box-shadow: 0 0 12px var(--green-glow);
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 36px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--t);
       font-family: var(--mono);
-      font-size: 11px;
-      color: rgba(0,255,136,0.25);
+      font-size: 12px;
+      caret-color: var(--g);
     }
+    #tin::placeholder { color: rgba(0,255,136,.2); }
 
-    /* ── Modal ── */
-    #modal-overlay, #edu-overlay {
+    /* ── MODALS ── */
+    .mov {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(8px);
-      z-index: 200;
+      background: rgba(0,0,0,.82);
+      backdrop-filter: blur(12px);
+      z-index: 400;
       align-items: center;
       justify-content: center;
       padding: 16px;
     }
-
-    #modal-overlay.open, #edu-overlay.open { display: flex; }
-
-    #modal {
-      background: #070f0b;
-      border: 1px solid rgba(0,255,136,0.25);
-      border-radius: 14px;
+    .mov.open { display: flex; }
+    .mbox {
+      background: #07100c;
+      border: 1px solid rgba(0,255,136,.22);
+      border-radius: 10px;
       width: 100%;
       max-width: 520px;
-      max-height: 85vh;
+      max-height: 82vh;
       overflow-y: auto;
-      padding: 28px 22px 24px;
+      padding: 24px 18px 20px;
       position: relative;
-      box-shadow: 0 0 40px rgba(0,255,136,0.06);
+    }
+    .mbox::-webkit-scrollbar { width: 3px; }
+    .mbox::-webkit-scrollbar-thumb { background: rgba(0,255,136,.18); }
+    .mt { font-size: 11px; color: var(--g); text-align: center; margin-bottom: 18px; letter-spacing: 3px; text-transform: uppercase; }
+    .mc { position: absolute; top: 12px; right: 12px; background: transparent; border: 1px solid rgba(0,255,136,.18); border-radius: 4px; width: 26px; height: 26px; color: var(--td); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .mc:hover { border-color: var(--g); color: var(--g); }
+    .cc { background: rgba(0,255,136,.025); border: 1px solid rgba(0,255,136,.09); border-radius: 5px; padding: 11px 13px; margin-bottom: 7px; transition: border-color .2s; }
+    .cc:hover { border-color: rgba(0,255,136,.28); }
+    .cc:last-child { margin-bottom: 0; }
+    .cn { font-size: 13px; font-weight: 600; color: #fff; }
+    .ci { font-size: 11px; color: var(--gc); margin-top: 3px; }
+    .cd { font-size: 10px; color: var(--td); margin-top: 2px; }
+    .cl { display: inline-flex; align-items: center; gap: 4px; margin-top: 7px; font-size: 10px; color: var(--g) !important; text-decoration: none; border: 1px solid rgba(0,255,136,.22); padding: 2px 10px; border-radius: 3px; letter-spacing: .8px; transition: background .2s; }
+    .cl:hover { background: rgba(0,255,136,.08); }
+
+    /* ── SOCIAL ROW ── */
+    #socials { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+    #socials a { width: 40px; height: 40px; border-radius: 50%; background: var(--s); border: 1px solid var(--b); display: flex; align-items: center; justify-content: center; font-size: 17px; text-decoration: none; color: var(--t); transition: background .2s, border-color .2s, box-shadow .2s, transform .15s; }
+    #socials a:hover { background: rgba(0,255,136,.12); border-color: var(--g); box-shadow: 0 0 14px rgba(0,255,136,.2); transform: translateY(-2px); }
+
+    footer { text-align: center; margin-top: 42px; font-size: 9px; color: rgba(0,255,136,.16); letter-spacing: 2px; }
+
+    /* Glow radial overlay */
+    #glow {
+      position: fixed;
+      top: -200px; left: 50%;
+      transform: translateX(-50%);
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(0,255,136,.055) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    #modal::-webkit-scrollbar { width: 4px; }
-    #modal::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.2); border-radius: 4px; }
-
-    #modal h2 {
-      font-family: var(--mono);
-      font-size: 15px;
-      color: var(--green);
-      text-align: center;
-      margin-bottom: 22px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-    }
-
-    #modal-close {
-      position: absolute;
-      top: 14px; right: 14px;
-      background: transparent;
-      border: 1px solid rgba(0,255,136,0.2);
-      border-radius: 6px;
-      width: 30px; height: 30px;
-      color: var(--text-dim);
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: border-color 0.2s, color 0.2s;
-    }
-
-    #modal-close:hover {
-      border-color: var(--green);
-      color: var(--green);
-    }
-
-    .cert-card {
-      background: rgba(0,255,136,0.03);
-      border: 1px solid rgba(0,255,136,0.1);
-      border-radius: 8px;
-      padding: 13px 15px;
-      margin-bottom: 10px;
-      position: relative;
-      transition: border-color 0.2s;
-    }
-
-    .cert-card:hover { border-color: rgba(0,255,136,0.3); }
-    .cert-card:last-child { margin-bottom: 0; }
-
-    .cert-card::before {
-      content: '▸';
-      position: absolute;
-      left: -1px; top: 13px;
-      color: var(--green);
-      font-size: 12px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .cert-card:hover::before { opacity: 1; }
-
-    .cert-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    .cert-issuer {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--green-dim);
-      margin-top: 3px;
-    }
-
-    .cert-date {
-      font-size: 10px;
-      color: var(--text-dim);
-      margin-top: 2px;
-    }
-
-    .cert-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 8px;
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--green) !important;
-      text-decoration: none;
-      border: 1px solid rgba(0,255,136,0.25);
-      padding: 3px 10px;
-      border-radius: 4px;
-      font-family: var(--mono);
-      letter-spacing: 0.5px;
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .cert-link:hover {
-      background: var(--green-glow-sm);
-      border-color: var(--green);
+    @media(max-width:500px) {
+      .lf { display: none; }
+      #gname { font-size: 16px; letter-spacing: 2px; }
     }
   </style>
 </head>
 <body>
 
-<div id="wrapper">
+<!-- BOOT SCREEN -->
+<div id="boot">
+  <div id="boot-text"></div>
+  <div id="boot-bar"><div id="boot-fill"></div></div>
+  <button id="boot-skip" onclick="skipBoot()">[ESC] SKIP</button>
+</div>
 
-  <!-- Top bar -->
-  <div class="topbar">
-    <span class="topbar-status">
-      <span class="status-dot"></span>
-      SECURE CONNECTION
-    </span>
-    <span>SEC_ANALYST // PT-BR</span>
+<!-- BACKGROUND -->
+<canvas id="mx"></canvas>
+<div id="sl"></div>
+<div id="glow"></div>
+
+<!-- MAIN WRAPPER -->
+<div id="wrap">
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <span>SYS://PROFILE_v2.6 &nbsp;|&nbsp; SEC_SHELL</span>
+    <div id="topbar-r">
+      <span><span class="blink-dot"></span>ONLINE</span>
+      <span id="clk">--:--:--</span>
+    </div>
   </div>
 
-  <!-- Profile -->
-  <div class="profile-block">
-    <div class="avatar-wrap">
-      <div class="avatar-ring"></div>
-      <div class="avatar">AS</div>
+  <!-- PROFILE -->
+  <div id="profile">
+    <div id="av-wrap">
+      <div class="ring r3"></div>
+      <div class="ring r2"></div>
+      <div class="ring r1"></div>
+      <div id="av">AS</div>
     </div>
-    <div class="profile-name">António Salvador</div>
-    <div class="profile-handle">[ @antoniojrms ]</div>
-    <div class="profile-bio">Analista de Segurança da Informação · Infraestrutura · Redes</div>
-    <div class="tags">
+
+    <div id="gname" data-t="ANTÓNIO SALVADOR">ANTÓNIO SALVADOR</div>
+    <div id="role"></div>
+
+    <div id="stats">
+      <div class="stat">
+        <div class="sl">UPTIME</div>
+        <div class="sv c" id="uptime">00:00:00</div>
+      </div>
+      <div class="stat">
+        <div class="sl">STATUS</div>
+        <div class="sv g">SECURE</div>
+      </div>
+      <div class="stat">
+        <div class="sl">CLEARANCE</div>
+        <div class="sv">LV.4</div>
+      </div>
+      <div class="stat">
+        <div class="sl">THREAT</div>
+        <div class="sv g">LOW</div>
+      </div>
+    </div>
+
+    <div id="tags">
       <span class="tag">INFOSEC</span>
       <span class="tag">ETHICAL HACKING</span>
       <span class="tag">LINUX</span>
       <span class="tag">NETWORKING</span>
       <span class="tag">BLUE TEAM</span>
+      <span class="tag">PENTESTING</span>
     </div>
   </div>
 
-  <div class="divider">// LINKS //</div>
+  <!-- LINKS -->
+  <div class="sec">// NETWORK INTERFACES</div>
 
-  <!-- Links -->
-  <div class="links">
-    <a class="link-item" href="https://www.linkedin.com/in/antoniojrms/" target="_blank">
-      <div class="link-icon">💼</div>
-      <div class="link-label">LinkedIn<span>Perfil profissional</span></div>
-      <span class="link-arrow">→</span>
-    </a>
+  <a class="li" href="https://www.linkedin.com/in/antoniojrms/" target="_blank">
+    <span class="lp">root@sec:~$</span>
+    <span class="lc">./connect</span>
+    <span class="lf">--target=linkedin --profile=antoniojrms</span>
+    <span>💼</span>
+    <span class="lic"> ›</span>
+  </a>
 
-    <a class="link-item" href="https://github.com/AntoniojoseRMS" target="_blank">
-      <div class="link-icon">🐙</div>
-      <div class="link-label">GitHub<span>Repositórios e projetos</span></div>
-      <span class="link-arrow">→</span>
-    </a>
+  <a class="li" href="https://github.com/AntoniojoseRMS" target="_blank">
+    <span class="lp">root@sec:~$</span>
+    <span class="lc">./connect</span>
+    <span class="lf">--target=github --user=AntoniojoseRMS</span>
+    <span>🐙</span>
+    <span class="lic"> ›</span>
+  </a>
 
-    <a class="link-item" href="mailto:antoniojmoraissalvador@gmail.com">
-      <div class="link-icon">✉️</div>
-      <div class="link-label">E-mail<span>antoniojmoraissalvador@gmail.com</span></div>
-      <span class="link-arrow">→</span>
-    </a>
+  <a class="li" href="mailto:antoniojmoraissalvador@gmail.com">
+    <span class="lp">root@sec:~$</span>
+    <span class="lc">./send-msg</span>
+    <span class="lf">--to=antoniojmoraissalvador@gmail.com</span>
+    <span>✉️</span>
+    <span class="lic"> ›</span>
+  </a>
 
-    <a class="link-item" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank">
-      <div class="link-icon">💬</div>
-      <div class="link-label">WhatsApp<span>+55 51 99170-7737</span></div>
-      <span class="link-arrow">→</span>
-    </a>
+  <a class="li" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank">
+    <span class="lp">root@sec:~$</span>
+    <span class="lc">./connect</span>
+    <span class="lf">--target=whatsapp --enc=E2E --phone=+5551991707737</span>
+    <span>💬</span>
+    <span class="lic"> ›</span>
+  </a>
 
-    <a class="link-item" href="https://instagram.com/Antoniojrms" target="_blank">
-      <div class="link-icon">📸</div>
-      <div class="link-label">Instagram<span>@Antoniojrms</span></div>
-      <span class="link-arrow">→</span>
-    </a>
+  <a class="li" href="https://instagram.com/Antoniojrms" target="_blank">
+    <span class="lp">root@sec:~$</span>
+    <span class="lc">./connect</span>
+    <span class="lf">--target=instagram --user=@Antoniojrms</span>
+    <span>📸</span>
+    <span class="lic"> ›</span>
+  </a>
 
-    <button class="link-item" onclick="openModal('certs')">
-      <div class="link-icon">🏅</div>
-      <div class="link-label">Certificações<span>10 licenças e certificados</span></div>
-      <span class="link-arrow">→</span>
-    </button>
+  <button class="li" onclick="openM('certs')">
+    <span class="lp">root@sec:~$</span>
+    <span class="lc">./list-certs</span>
+    <span class="lf">--count=10 --status=valid --format=json</span>
+    <span>🏅</span>
+    <span class="lic"> ›</span>
+  </button>
 
-    <button class="link-item" onclick="openModal('edu')">
-      <div class="link-icon">🎓</div>
-      <div class="link-label">Formação Académica<span>3 cursos concluídos</span></div>
-      <span class="link-arrow">→</span>
-    </button>
-  </div>
+  <button class="li" onclick="openM('edu')">
+    <span class="lp">root@sec:~$</span>
+    <span class="lc">./education</span>
+    <span class="lf">--degrees=3 --show-certs --verify</span>
+    <span>🎓</span>
+    <span class="lic"> ›</span>
+  </button>
 
-  <!-- Social icons -->
-  <div class="social-row">
+  <!-- SOCIAL ICONS -->
+  <div id="socials">
     <a href="https://www.linkedin.com/in/antoniojrms/" target="_blank" title="LinkedIn">
       <ion-icon name="logo-linkedin"></ion-icon>
     </a>
@@ -565,106 +597,88 @@
     </a>
   </div>
 
-  <footer>// © 2026 ANTÓNIO SALVADOR · INFOSEC //</footer>
+  <!-- INTERACTIVE TERMINAL -->
+  <div class="sec">// INTERACTIVE SHELL</div>
+  <div id="term">
+    <div id="th">
+      <span class="td tdr"></span>
+      <span class="td tdy"></span>
+      <span class="td tdg"></span>
+      <span style="margin-left:8px;font-size:11px;">bash — antonio@sec-shell — 80×24</span>
+    </div>
+    <div id="to">
+      <div class="tl info">Sistema inicializado. Operador identificado: <span style="color:var(--g)">ANTÓNIO SALVADOR</span></div>
+      <div class="tl info">Digite <span style="color:var(--g)">help</span> para ver os comandos disponíveis.</div>
+    </div>
+    <div id="tir">
+      <span id="tip">[antonio@sec-shell ~]$&nbsp;</span>
+      <input id="tin" type="text" spellcheck="false" autocomplete="off" placeholder="help"/>
+    </div>
+  </div>
+
+  <footer>// © 2026 ANTÓNIO SALVADOR · INFOSEC · ALL RIGHTS RESERVED //</footer>
 </div>
 
-<!-- Modal Formação Académica -->
-<div id="edu-overlay" onclick="handleOverlayClick(event,'edu')">
-  <div id="modal" style="background:#070f0b;border:1px solid rgba(0,255,136,0.25);border-radius:14px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;padding:28px 22px 24px;position:relative;box-shadow:0 0 40px rgba(0,255,136,0.06);">
-    <button id="edu-close" onclick="closeModal('edu')" style="position:absolute;top:14px;right:14px;background:transparent;border:1px solid rgba(0,255,136,0.2);border-radius:6px;width:30px;height:30px;color:rgba(224,255,232,0.5);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-    <h2 style="font-family:'Share Tech Mono',monospace;font-size:15px;color:#00ff88;text-align:center;margin-bottom:22px;letter-spacing:2px;text-transform:uppercase;">// Formação Académica //</h2>
-
-    <div class="cert-card">
-      <div class="cert-name">MBA em Cybersecurity e Cybercrimes</div>
-      <div class="cert-issuer">Anhanguera Educacional</div>
-      <div class="cert-date">Jul 2023 – Dez 2023 · Pós-graduação · Concluído</div>
-      <div class="cert-date" style="margin-top:4px;">Competências: Segurança de rede · Infraestrutura</div>
-      <a class="cert-link" href="https://antoniojoserms.github.io/links/Cybersecurity%20e%20cybercrimes.pdf" target="_blank">▸ VER CERTIFICADO</a>
+<!-- MODAL CERTS -->
+<div id="m-certs" class="mov" onclick="overlayClick(event,'certs')">
+  <div class="mbox">
+    <button class="mc" onclick="closeM('certs')">✕</button>
+    <div class="mt">// 10 Certificações //</div>
+    <div class="cc"><div class="cn">Nexthink Associate</div><div class="ci">Nexthink</div></div>
+    <div class="cc"><div class="cn">IT Support Associate</div><div class="ci">Nexthink</div></div>
+    <div class="cc"><div class="cn">IT Support Professional</div><div class="ci">Nexthink</div></div>
+    <div class="cc">
+      <div class="cn">CRPO — Certified Ransomware Protection Officer</div>
+      <div class="ci">ICTTF - United for Digital Resilience</div>
+      <div class="cd">fev. 2026 · ID: 64d63660ac9488bbf50f3e76</div>
+      <a class="cl" href="https://mycourse.app/cuewiFxSN4aozzbr1" target="_blank">▸ VER CREDENCIAL</a>
     </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Graphic Design</div>
-      <div class="cert-issuer">Anhanguera Educacional</div>
-      <div class="cert-date">Nov 2023 – Mai 2024 · Pós-graduação · Concluído</div>
-      <div class="cert-date" style="margin-top:4px;">Competências: Solução de problemas de hardware · Administração de redes</div>
-      <a class="cert-link" href="https://antoniojoserms.github.io/links/Design%20Gr%C3%A1fico.pdf" target="_blank">▸ VER CERTIFICADO</a>
+    <div class="cc">
+      <div class="cn">Introduction to Cybersecurity</div>
+      <div class="ci">Cisco</div>
+      <div class="cd">fev. 2026</div>
+      <a class="cl" href="https://www.credly.com/badges/b3bd9674-3b27-4a63-b90f-cad1fb4c59a2/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
     </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Análise e Desenvolvimento de Sistemas</div>
-      <div class="cert-issuer">Estácio</div>
-      <div class="cert-date">Jan 2021 – Jul 2023 · Bacharelado · Concluído</div>
-      <div class="cert-date" style="margin-top:4px;">Competências: Infraestrutura · Solução de problemas de hardware</div>
-      <a class="cert-link" href="https://antoniojoserms.github.io/links/ADS.pdf" target="_blank">▸ VER CERTIFICADO</a>
+    <div class="cc">
+      <div class="cn">Segurança em Linux</div>
+      <div class="ci">IBSEC - Instituto Brasileiro de Cibersegurança</div>
+      <div class="cd">fev. 2026</div>
+      <a class="cl" href="https://certs.ibsec.com.br?cert_hash=c9966ec4d0b375a0" target="_blank">▸ VER CREDENCIAL</a>
     </div>
+    <div class="cc">
+      <div class="cn">Getting Started in Cybersecurity 3.0</div>
+      <div class="ci">Fortinet</div>
+      <div class="cd">fev. 2026</div>
+      <a class="cl" href="https://www.credly.com/badges/13ec5088-ef79-4844-a36c-31bb2120385e/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
+    </div>
+    <div class="cc"><div class="cn">Introdução ao Sistema Operacional Linux</div><div class="ci">Udemy</div><div class="cd">jan. 2026</div></div>
+    <div class="cc"><div class="cn">Hacker Ético Profissional com Kali Linux v2023</div><div class="ci">Udemy</div><div class="cd">mai. 2023</div></div>
+    <div class="cc"><div class="cn">Redes TCP/IP</div><div class="ci">Udemy</div><div class="cd">mai. 2022</div></div>
   </div>
 </div>
 
-<!-- Modal Certificações -->
-<div id="modal-overlay" onclick="handleOverlayClick(event,'certs')">
-  <div id="modal">
-    <button id="modal-close" onclick="closeModal('certs')">✕</button>
-    <h2>// Certificações //</h2>
-
-    <div class="cert-card">
-      <div class="cert-name">Nexthink Associate</div>
-      <div class="cert-issuer">Nexthink</div>
+<!-- MODAL EDU -->
+<div id="m-edu" class="mov" onclick="overlayClick(event,'edu')">
+  <div class="mbox">
+    <button class="mc" onclick="closeM('edu')">✕</button>
+    <div class="mt">// Formação Académica //</div>
+    <div class="cc">
+      <div class="cn">MBA em Cybersecurity e Cybercrimes</div>
+      <div class="ci">Anhanguera Educacional</div>
+      <div class="cd">Jul 2023 – Dez 2023 · Pós-graduação · Concluído</div>
+      <a class="cl" href="https://antoniojoserms.github.io/links/Cybersecurity%20e%20cybercrimes.pdf" target="_blank">▸ VER CERTIFICADO</a>
     </div>
-
-    <div class="cert-card">
-      <div class="cert-name">IT Support Associate</div>
-      <div class="cert-issuer">Nexthink</div>
+    <div class="cc">
+      <div class="cn">Graphic Design</div>
+      <div class="ci">Anhanguera Educacional</div>
+      <div class="cd">Nov 2023 – Mai 2024 · Pós-graduação · Concluído</div>
+      <a class="cl" href="https://antoniojoserms.github.io/links/Design%20Gr%C3%A1fico.pdf" target="_blank">▸ VER CERTIFICADO</a>
     </div>
-
-    <div class="cert-card">
-      <div class="cert-name">IT Support Professional</div>
-      <div class="cert-issuer">Nexthink</div>
-    </div>
-
-    <div class="cert-card">
-      <div class="cert-name">CRPO — Certified Ransomware Protection Officer</div>
-      <div class="cert-issuer">ICTTF - United for Digital Resilience</div>
-      <div class="cert-date">Emitida em fev. 2026 · Código: 64d63660ac9488bbf50f3e76</div>
-      <a class="cert-link" href="https://mycourse.app/cuewiFxSN4aozzbr1" target="_blank">▸ VER CREDENCIAL</a>
-    </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Introduction to Cybersecurity</div>
-      <div class="cert-issuer">Cisco</div>
-      <div class="cert-date">Emitida em fev. 2026</div>
-      <a class="cert-link" href="https://www.credly.com/badges/b3bd9674-3b27-4a63-b90f-cad1fb4c59a2/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
-    </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Segurança em Linux</div>
-      <div class="cert-issuer">IBSEC - Instituto Brasileiro de Cibersegurança</div>
-      <div class="cert-date">Emitida em fev. 2026</div>
-      <a class="cert-link" href="https://certs.ibsec.com.br?cert_hash=c9966ec4d0b375a0" target="_blank">▸ VER CREDENCIAL</a>
-    </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Getting Started in Cybersecurity 3.0</div>
-      <div class="cert-issuer">Fortinet</div>
-      <div class="cert-date">Emitida em fev. 2026</div>
-      <a class="cert-link" href="https://www.credly.com/badges/13ec5088-ef79-4844-a36c-31bb2120385e/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
-    </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Introdução ao Sistema Operacional Linux</div>
-      <div class="cert-issuer">Udemy</div>
-      <div class="cert-date">Emitida em jan. 2026</div>
-    </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Hacker Ético Profissional com Kali Linux v2023</div>
-      <div class="cert-issuer">Udemy</div>
-      <div class="cert-date">Emitida em mai. 2023</div>
-    </div>
-
-    <div class="cert-card">
-      <div class="cert-name">Redes TCP/IP</div>
-      <div class="cert-issuer">Udemy</div>
-      <div class="cert-date">Emitida em mai. 2022</div>
+    <div class="cc">
+      <div class="cn">Análise e Desenvolvimento de Sistemas</div>
+      <div class="ci">Estácio</div>
+      <div class="cd">Jan 2021 – Jul 2023 · Bacharelado · Concluído</div>
+      <a class="cl" href="https://antoniojoserms.github.io/links/ADS.pdf" target="_blank">▸ VER CERTIFICADO</a>
     </div>
   </div>
 </div>
@@ -672,26 +686,284 @@
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script>
-  function openModal(type) {
-    const id = type === 'edu' ? 'edu-overlay' : 'modal-overlay';
-    document.getElementById(id).classList.add("open");
-    document.body.style.overflow = "hidden";
+/* ── MATRIX RAIN ── */
+(function() {
+  const cv = document.getElementById('mx');
+  const cx = cv.getContext('2d');
+  const ch = 'ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコサシスセソ0123456789@#$%^&*[]{}|;:<>?/\\';
+  let drops = [];
+
+  function resize() {
+    cv.width  = window.innerWidth;
+    cv.height = window.innerHeight;
+    drops = Array(Math.floor(cv.width / 18)).fill(0).map(() => Math.random() * -50);
   }
-  function closeModal(type) {
-    const id = type === 'edu' ? 'edu-overlay' : 'modal-overlay';
-    document.getElementById(id).classList.remove("open");
-    document.body.style.overflow = "";
+  resize();
+  window.addEventListener('resize', resize);
+
+  setInterval(() => {
+    cx.fillStyle = 'rgba(5,13,10,0.055)';
+    cx.fillRect(0, 0, cv.width, cv.height);
+    drops.forEach((y, i) => {
+      const c = ch[Math.floor(Math.random() * ch.length)];
+      const bright = Math.random() > 0.95;
+      cx.fillStyle = bright ? '#ffffff' : `rgba(0,255,136,${(Math.random() * 0.5 + 0.3).toFixed(2)})`;
+      cx.font = '13px Share Tech Mono';
+      cx.fillText(c, i * 18, y * 18);
+      if (y * 18 > cv.height && Math.random() > 0.97) drops[i] = 0;
+      drops[i] += 0.5 + Math.random() * 0.5;
+    });
+  }, 55);
+})();
+
+/* ── BOOT SEQUENCE ── */
+const BOOT_LINES = [
+  'BIOS v3.14.15 ... [OK]',
+  'Checking memory integrity ... [OK]',
+  'Loading kernel modules ... [OK]',
+  'Initializing firewall rules ... [OK]',
+  'Mounting encrypted volumes ... [OK]',
+  'Importing SSL/TLS certificates ... [OK]',
+  'Establishing secure channel ... [OK]',
+  'Scanning for threats ... [NONE DETECTED]',
+  'Verifying operator identity ...',
+  '  > Fingerprint match: ANTÓNIO SALVADOR ... [CONFIRMED]',
+  '  > Clearance level 4 ... [GRANTED]',
+  '',
+  '[ SYSTEM READY — WELCOME BACK, OPERATOR ]',
+];
+
+let booting = true;
+let t0 = Date.now();
+
+async function runBoot() {
+  const el = document.getElementById('boot-text');
+  const fill = document.getElementById('boot-fill');
+  let text = '';
+  for (let i = 0; i < BOOT_LINES.length; i++) {
+    if (!booting) return;
+    text += BOOT_LINES[i] + '\n';
+    el.textContent = text;
+    fill.style.width = ((i + 1) / BOOT_LINES.length * 100) + '%';
+    await sleep(i < BOOT_LINES.length - 2 ? 90 + Math.random() * 70 : 350);
   }
-  function handleOverlayClick(e, type) {
-    const id = type === 'edu' ? 'edu-overlay' : 'modal-overlay';
-    if (e.target === document.getElementById(id)) closeModal(type);
-  }
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") {
-      closeModal('certs');
-      closeModal('edu');
+  await sleep(500);
+  if (booting) endBoot();
+}
+
+function endBoot() {
+  booting = false;
+  t0 = Date.now();
+  const b = document.getElementById('boot');
+  b.classList.add('out');
+  setTimeout(() => b.style.display = 'none', 520);
+  startUptime();
+  startTyping();
+}
+
+function skipBoot() {
+  booting = false;
+  t0 = Date.now();
+  document.getElementById('boot').style.display = 'none';
+  startUptime();
+  startTyping();
+}
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+runBoot();
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && booting) skipBoot(); });
+
+/* ── CLOCK ── */
+function tick() {
+  const n = new Date();
+  const pad = v => String(v).padStart(2,'0');
+  document.getElementById('clk').textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
+}
+tick(); setInterval(tick, 1000);
+
+/* ── UPTIME ── */
+function startUptime() {
+  setInterval(() => {
+    const e = Date.now() - t0;
+    const pad = v => String(v).padStart(2,'0');
+    const h = Math.floor(e / 3600000);
+    const m = Math.floor((e % 3600000) / 60000);
+    const s = Math.floor((e % 60000) / 1000);
+    document.getElementById('uptime').textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }, 1000);
+}
+
+/* ── TYPING ANIMATION ── */
+const ROLES = [
+  'ANALISTA DE SEGURANÇA DA INFORMAÇÃO',
+  'INFOSEC SPECIALIST',
+  'ETHICAL HACKER',
+  'NETWORK SECURITY ANALYST',
+  'LINUX SYSTEM ADMINISTRATOR',
+  'BLUE TEAM DEFENDER',
+];
+let ri = 0, ci = 0, del = false;
+
+function startTyping() {
+  const el = document.getElementById('role');
+  function tick() {
+    const r = ROLES[ri];
+    if (!del) {
+      el.textContent = r.slice(0, ++ci);
+      if (ci === r.length) { del = true; return setTimeout(tick, 2200); }
+    } else {
+      el.textContent = r.slice(0, --ci);
+      if (ci === 0) { del = false; ri = (ri + 1) % ROLES.length; return setTimeout(tick, 380); }
     }
-  });
+    setTimeout(tick, del ? 38 : 68);
+  }
+  tick();
+}
+
+/* ── MODALS ── */
+function openM(id) {
+  document.getElementById('m-' + id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeM(id) {
+  document.getElementById('m-' + id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function overlayClick(e, id) {
+  if (e.target === document.getElementById('m-' + id)) closeM(id);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeM('certs'); closeM('edu'); }
+});
+
+/* ── INTERACTIVE TERMINAL ── */
+const to  = document.getElementById('to');
+const tin = document.getElementById('tin');
+const hist = [];
+let hi = -1;
+
+const CMDS = {
+  help: () => [
+    ['hd', '╔══════════════════════════════════════╗'],
+    ['hd', '║  COMANDOS DISPONÍVEIS                ║'],
+    ['hd', '╚══════════════════════════════════════╝'],
+    ['cy', '  whoami   → perfil do operador'],
+    ['cy', '  skills   → stack técnico'],
+    ['cy', '  contact  → canais de contacto'],
+    ['cy', '  certs    → listar certificações (abre modal)'],
+    ['cy', '  edu      → formação académica (abre modal)'],
+    ['cy', '  ls       → listar links'],
+    ['cy', '  status   → estado do sistema'],
+    ['cy', '  matrix   → alternar modo matrix'],
+    ['cy', '  clear    → limpar terminal'],
+    ['info', ''],
+  ],
+  whoami: () => [
+    ['ok',   '> OPERADOR IDENTIFICADO:'],
+    ['info', '  Nome    : António Salvador'],
+    ['info', '  Handle  : @antoniojrms'],
+    ['info', '  Função  : Analista de Segurança da Informação'],
+    ['info', '  Base    : Brasil 🇧🇷'],
+    ['info', '  Foco    : Infosec · Linux · Networking · Blue Team'],
+    ['info', '  E-mail  : antoniojmoraissalvador@gmail.com'],
+    ['ok',   '> CLEARANCE LEVEL 4 — ACESSO CONCEDIDO'],
+  ],
+  skills: () => [
+    ['ok',   '> STACK TÉCNICO:'],
+    ['cy',   '  Cibersegurança     [████████████░░] 85%'],
+    ['cy',   '  Linux Admin        [████████████░░] 84%'],
+    ['cy',   '  Network Security   [██████████░░░░] 75%'],
+    ['cy',   '  Ethical Hacking    [█████████░░░░░] 70%'],
+    ['cy',   '  Kali / Pentesting  [████████░░░░░░] 65%'],
+    ['cy',   '  Análise de Sistemas[█████████████░] 90%'],
+    ['ok',   '> TOTAL CERTIFICAÇÕES: 10 | DIPLOMAS: 3'],
+  ],
+  contact: () => [
+    ['ok',   '> CANAIS DE CONTACTO:'],
+    ['info', '  LinkedIn  → linkedin.com/in/antoniojrms'],
+    ['info', '  GitHub    → github.com/AntoniojoseRMS'],
+    ['info', '  E-mail    → antoniojmoraissalvador@gmail.com'],
+    ['info', '  WhatsApp  → +55 51 99170-7737'],
+    ['info', '  Instagram → @Antoniojrms'],
+  ],
+  ls: () => [
+    ['ok',   '> /home/antonio/links:'],
+    ['info', '  drwxr-xr-x  linkedin/'],
+    ['info', '  drwxr-xr-x  github/'],
+    ['info', '  drwxr-xr-x  email/'],
+    ['info', '  drwxr-xr-x  whatsapp/'],
+    ['info', '  drwxr-xr-x  instagram/'],
+    ['info', '  -rw-r--r--  certifications.json  (10 items)'],
+    ['info', '  -rw-r--r--  education.json        (3 items)'],
+  ],
+  status: () => {
+    const e = Date.now() - t0;
+    const h = Math.floor(e/3600000), m = Math.floor((e%3600000)/60000), s = Math.floor((e%60000)/1000);
+    return [
+      ['ok',   '> SYSTEM STATUS:'],
+      ['info', `  Uptime   : ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`],
+      ['info', '  Firewall : ACTIVE — 247 rules loaded'],
+      ['info', '  SSL/TLS  : TLS 1.3 ENABLED'],
+      ['info', '  Ameaças  : NENHUMA DETECTADA'],
+      ['ok',   '> TODOS OS SISTEMAS NOMINAIS ✓'],
+    ];
+  },
+  certs: () => { openM('certs'); return [['ok', '> Abrindo certificações...']]; },
+  edu:   () => { openM('edu');   return [['ok', '> Abrindo formação académica...']]; },
+  matrix: () => {
+    const cv = document.getElementById('mx');
+    const on = parseFloat(cv.style.opacity || 0.13) < 0.2;
+    cv.style.opacity = on ? 0.55 : 0.13;
+    return [['ok', '> Matrix mode ' + (on ? 'INTENSIFICADO' : 'NORMAL')]];
+  },
+  clear: () => { to.innerHTML = ''; return null; },
+};
+
+function addLine(cls, txt) {
+  const d = document.createElement('div');
+  d.className = 'tl ' + cls;
+  d.textContent = txt;
+  to.appendChild(d);
+  to.scrollTop = to.scrollHeight;
+}
+
+function runCmd(raw) {
+  const cmd = raw.trim().toLowerCase();
+  addLine('cmd', `[antonio@sec-shell ~]$ ${raw}`);
+  if (!cmd) return;
+  const fn = CMDS[cmd];
+  if (fn) {
+    const lines = fn();
+    if (lines) lines.forEach(([c, t]) => addLine(c, t));
+  } else {
+    addLine('err', `bash: ${cmd}: command not found`);
+    addLine('info', "  Dica: tente 'help'");
+  }
+}
+
+tin.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const v = tin.value;
+    if (v.trim()) { hist.unshift(v); hi = -1; }
+    runCmd(v);
+    tin.value = '';
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    hi = Math.min(hi + 1, hist.length - 1);
+    tin.value = hist[hi] || '';
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    hi = Math.max(hi - 1, -1);
+    tin.value = hi >= 0 ? hist[hi] : '';
+  } else if (e.key === 'Tab') {
+    e.preventDefault();
+    const partial = tin.value.toLowerCase();
+    const match = Object.keys(CMDS).find(k => k.startsWith(partial) && k !== partial);
+    if (match) tin.value = match;
+  }
+});
+
+document.getElementById('term').addEventListener('click', () => tin.focus());
 </script>
 </body>
 </html>
