@@ -6,7 +6,7 @@
   <title>António Salvador // INFOSEC</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -281,18 +281,18 @@
     .li {
       display: flex;
       align-items: center;
-      padding: 11px 14px;
+      gap: 14px;
+      padding: 13px 16px;
       background: rgba(0,255,136,.025);
       border: 1px solid rgba(0,255,136,.1);
-      border-radius: 5px;
+      border-radius: 6px;
       text-decoration: none;
       cursor: pointer;
       color: var(--t);
       width: 100%;
       text-align: left;
       font-family: var(--mono);
-      font-size: 12px;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
       position: relative;
       overflow: hidden;
       transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
@@ -309,28 +309,65 @@
       transition: transform .2s;
     }
     .li:hover, .li:focus {
-      background: rgba(0,255,136,.065);
-      border-color: rgba(0,255,136,.35);
-      transform: translateX(5px);
-      box-shadow: -5px 0 25px rgba(0,255,136,.04);
+      background: rgba(0,255,136,.06);
+      border-color: rgba(0,255,136,.38);
+      transform: translateX(4px);
+      box-shadow: -4px 0 20px rgba(0,255,136,.05);
     }
     .li:hover::before, .li:focus::before { transform: scaleY(1); }
-    /* shimmer */
     .li::after {
       content: '';
       position: absolute;
       inset: 0;
       background: linear-gradient(90deg, transparent, rgba(0,255,136,.04), transparent);
       transform: translateX(-100%);
-      transition: transform .6s;
+      transition: transform .55s;
     }
     .li:hover::after { transform: translateX(100%); }
 
-    .lp { color: var(--gc); margin-right: 6px; flex-shrink: 0; font-size: 11px; }
-    .lc { color: var(--g); margin-right: 4px; flex-shrink: 0; }
-    .lf { color: rgba(0,229,255,.65); flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-    .lic { color: rgba(0,255,136,.3); transition: color .2s, transform .2s; font-size: 13px; margin-left: 8px; flex-shrink: 0; }
-    .li:hover .lic { color: var(--g); transform: translateX(3px); }
+    /* Icon box */
+    .li-ico {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      background: rgba(0,255,136,.07);
+      border: 1px solid rgba(0,255,136,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: background .2s, border-color .2s, box-shadow .2s;
+    }
+    .li:hover .li-ico {
+      background: rgba(0,255,136,.13);
+      border-color: rgba(0,255,136,.4);
+      box-shadow: 0 0 12px rgba(0,255,136,.15);
+    }
+
+    /* Text */
+    .li-txt { flex: 1; min-width: 0; }
+    .li-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--t);
+      letter-spacing: .5px;
+      font-family: 'Inter', var(--mono);
+    }
+    .li-sub {
+      font-size: 11px;
+      color: var(--td);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Arrow */
+    .li-arr {
+      color: rgba(0,255,136,.28);
+      font-size: 18px;
+      flex-shrink: 0;
+      transition: color .2s, transform .2s;
+    }
+    .li:hover .li-arr { color: var(--g); transform: translateX(3px); }
 
     /* ── MINI TERMINAL ── */
     #term {
@@ -520,62 +557,69 @@
   </div>
 
   <!-- LINKS -->
-  <div class="sec">// NETWORK INTERFACES</div>
+  <div class="sec">// CONTACTOS &amp; REDES</div>
 
   <a class="li" href="https://www.linkedin.com/in/antoniojrms/" target="_blank">
-    <span class="lp">root@sec:~$</span>
-    <span class="lc">./connect</span>
-    <span class="lf">--target=linkedin --profile=antoniojrms</span>
-    <span>💼</span>
-    <span class="lic"> ›</span>
+    <div class="li-ico">💼</div>
+    <div class="li-txt">
+      <div class="li-name">LinkedIn</div>
+      <div class="li-sub">linkedin.com/in/antoniojrms</div>
+    </div>
+    <span class="li-arr">›</span>
   </a>
 
   <a class="li" href="https://github.com/AntoniojoseRMS" target="_blank">
-    <span class="lp">root@sec:~$</span>
-    <span class="lc">./connect</span>
-    <span class="lf">--target=github --user=AntoniojoseRMS</span>
-    <span>🐙</span>
-    <span class="lic"> ›</span>
+    <div class="li-ico">🐙</div>
+    <div class="li-txt">
+      <div class="li-name">GitHub</div>
+      <div class="li-sub">github.com/AntoniojoseRMS</div>
+    </div>
+    <span class="li-arr">›</span>
   </a>
 
   <a class="li" href="mailto:antoniojmoraissalvador@gmail.com">
-    <span class="lp">root@sec:~$</span>
-    <span class="lc">./send-msg</span>
-    <span class="lf">--to=antoniojmoraissalvador@gmail.com</span>
-    <span>✉️</span>
-    <span class="lic"> ›</span>
+    <div class="li-ico">✉️</div>
+    <div class="li-txt">
+      <div class="li-name">E-mail</div>
+      <div class="li-sub">antoniojmoraissalvador@gmail.com</div>
+    </div>
+    <span class="li-arr">›</span>
   </a>
 
   <a class="li" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank">
-    <span class="lp">root@sec:~$</span>
-    <span class="lc">./connect</span>
-    <span class="lf">--target=whatsapp --enc=E2E --phone=+5551991707737</span>
-    <span>💬</span>
-    <span class="lic"> ›</span>
+    <div class="li-ico">💬</div>
+    <div class="li-txt">
+      <div class="li-name">WhatsApp</div>
+      <div class="li-sub">+55 51 99170-7737</div>
+    </div>
+    <span class="li-arr">›</span>
   </a>
 
   <a class="li" href="https://instagram.com/Antoniojrms" target="_blank">
-    <span class="lp">root@sec:~$</span>
-    <span class="lc">./connect</span>
-    <span class="lf">--target=instagram --user=@Antoniojrms</span>
-    <span>📸</span>
-    <span class="lic"> ›</span>
+    <div class="li-ico">📸</div>
+    <div class="li-txt">
+      <div class="li-name">Instagram</div>
+      <div class="li-sub">@Antoniojrms</div>
+    </div>
+    <span class="li-arr">›</span>
   </a>
 
   <button class="li" onclick="openM('certs')">
-    <span class="lp">root@sec:~$</span>
-    <span class="lc">./list-certs</span>
-    <span class="lf">--count=10 --status=valid --format=json</span>
-    <span>🏅</span>
-    <span class="lic"> ›</span>
+    <div class="li-ico">🏅</div>
+    <div class="li-txt">
+      <div class="li-name">Certificações</div>
+      <div class="li-sub">10 licenças e certificados profissionais</div>
+    </div>
+    <span class="li-arr">›</span>
   </button>
 
   <button class="li" onclick="openM('edu')">
-    <span class="lp">root@sec:~$</span>
-    <span class="lc">./education</span>
-    <span class="lf">--degrees=3 --show-certs --verify</span>
-    <span>🎓</span>
-    <span class="lic"> ›</span>
+    <div class="li-ico">🎓</div>
+    <div class="li-txt">
+      <div class="li-name">Formação Académica</div>
+      <div class="li-sub">3 diplomas · certificados em PDF</div>
+    </div>
+    <span class="li-arr">›</span>
   </button>
 
   <!-- SOCIAL ICONS -->
