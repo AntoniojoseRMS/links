@@ -1095,6 +1095,42 @@ document.getElementById('term').addEventListener('click', () => tin.focus());
 const PROJ_ICONS = { HTML:'🌐', JavaScript:'⚡', Python:'🐍', CSS:'🎨', Java:'☕', 'C++':'⚙️', TypeScript:'💙', Shell:'🖥️' };
 const PROJ_SKIP = ['links']; // repo da própria página
 
+// Projetos externos (fora do GitHub) — sempre aparecem no topo
+const EXTRA_PROJECTS = [
+  {
+    icon: '✝️',
+    name: 'JMJ Coreia 2027 — Peregrinação',
+    desc: 'Painel de acompanhamento de pagamentos de peregrinos para a Jornada Mundial da Juventude Seul 2027. Gestão de carnês, parcelas e resumo geral por peregrino.',
+    lang: 'JavaScript',
+    liveUrl: 'https://magical-puffpuff-94ea80.netlify.app',
+    ghUrl: null,
+    badge: 'Netlify',
+  },
+];
+
+function buildProjCard({ icon, name, desc, lang, liveUrl, ghUrl, badge, updated, stars }) {
+  const langClass = (lang||'').toLowerCase().replace(/[^a-z]/g,'');
+  return `<div class="proj-card">
+    <div class="proj-top">
+      <div class="proj-icon">${icon}</div>
+      <div class="proj-info">
+        <div class="proj-name">${name}</div>
+        <div class="proj-desc">${desc}</div>
+      </div>
+    </div>
+    <div class="proj-meta">
+      ${lang ? `<span class="proj-lang ${langClass}">${lang}</span>` : ''}
+      ${badge ? `<span class="proj-lang" style="color:var(--c);border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.06);">${badge}</span>` : ''}
+      ${updated ? `<span style="font-size:10px;color:var(--td);">Atualizado: ${updated}</span>` : ''}
+      ${stars > 0 ? `<span style="font-size:10px;color:var(--td);">⭐ ${stars}</span>` : ''}
+    </div>
+    <div class="proj-btns">
+      ${ghUrl  ? `<a class="proj-btn gh"   href="${ghUrl}"  target="_blank">⌥ Ver Código</a>` : ''}
+      ${liveUrl? `<a class="proj-btn live" href="${liveUrl}" target="_blank">▶ Ver ao Vivo</a>` : ''}
+    </div>
+  </div>`;
+}
+
 let projLoaded = false;
 
 async function loadProjects() {
@@ -1107,44 +1143,27 @@ async function loadProjects() {
 
     const filtered = repos.filter(r => !r.fork && !PROJ_SKIP.includes(r.name) && !r.archived);
 
-    if (!filtered.length) {
-      el.innerHTML = '<div class="proj-loading">Nenhum projeto encontrado.</div>';
-      return;
-    }
+    const extraHtml = EXTRA_PROJECTS.map(p => buildProjCard(p)).join('');
 
-    el.innerHTML = filtered.map(r => {
-      const lang = r.language || '';
-      const langClass = lang.toLowerCase().replace(/[^a-z]/g,'');
-      const icon = PROJ_ICONS[lang] || '📁';
-      const desc = r.description || 'Sem descrição.';
-      const ghUrl = r.html_url;
-      const pagesUrl = r.has_pages ? `https://antoniojoserms.github.io/${r.name}/` : null;
-      const name = r.name.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase());
-      const updated = new Date(r.updated_at).toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
+    const repoHtml = filtered.map(r => buildProjCard({
+      icon: PROJ_ICONS[r.language] || '📁',
+      name: r.name.replace(/-/g,' ').replace(/\b\w/g, c => c.toUpperCase()),
+      desc: r.description || 'Sem descrição.',
+      lang: r.language || '',
+      liveUrl: r.has_pages ? `https://antoniojoserms.github.io/${r.name}/` : null,
+      ghUrl: r.html_url,
+      badge: r.has_pages ? 'GitHub Pages' : null,
+      updated: new Date(r.updated_at).toLocaleDateString('pt-BR', {month:'short', year:'numeric'}),
+      stars: r.stargazers_count,
+    })).join('');
 
-      return `<div class="proj-card">
-        <div class="proj-top">
-          <div class="proj-icon">${icon}</div>
-          <div class="proj-info">
-            <div class="proj-name">${name}</div>
-            <div class="proj-desc">${desc}</div>
-          </div>
-        </div>
-        <div class="proj-meta">
-          ${lang ? `<span class="proj-lang ${langClass}">${lang}</span>` : ''}
-          <span style="font-size:10px;color:var(--td);">Atualizado: ${updated}</span>
-          ${r.stargazers_count > 0 ? `<span style="font-size:10px;color:var(--td);">⭐ ${r.stargazers_count}</span>` : ''}
-        </div>
-        <div class="proj-btns">
-          <a class="proj-btn gh" href="${ghUrl}" target="_blank">⌥ Ver Código</a>
-          ${pagesUrl ? `<a class="proj-btn live" href="${pagesUrl}" target="_blank">▶ Ver ao Vivo</a>` : ''}
-        </div>
-      </div>`;
-    }).join('');
-
+    el.innerHTML = extraHtml + repoHtml || '<div class="proj-loading">Nenhum projeto encontrado.</div>';
     projLoaded = true;
   } catch(e) {
-    el.innerHTML = `<div class="proj-loading">Erro ao carregar projetos.<br><span style="color:var(--r);font-size:10px;">${e.message}</span></div>`;
+    // Se a API falhar, mostra pelo menos os extras
+    const extraHtml = EXTRA_PROJECTS.map(p => buildProjCard(p)).join('');
+    el.innerHTML = extraHtml + `<div class="proj-loading" style="margin-top:10px;">Não foi possível carregar repositórios GitHub.<br><span style="color:var(--r);font-size:10px;">${e.message}</span></div>`;
+    projLoaded = true;
   }
 }
 
