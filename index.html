@@ -836,6 +836,127 @@
     #rc-send:hover { background: #00e87a; }
     #rc-send:disabled { opacity: .5; cursor: default; }
     #rc-status { font-size: 11px; margin-top: 8px; text-align: center; min-height: 14px; }
+
+    /* ── HUD FRAME (viewport-fixed) ── */
+    @keyframes hud-pulse { 0%,100%{opacity:.35} 50%{opacity:.85} }
+    @keyframes hud-sweep {
+      0%   { transform: translateY(-100%); opacity: 0; }
+      5%   { opacity: .5; }
+      95%  { opacity: .5; }
+      100% { transform: translateY(100vh); opacity: 0; }
+    }
+    .hud-corner {
+      position: fixed;
+      width: 22px; height: 22px;
+      border: 1px solid rgba(0,255,136,.35);
+      z-index: 500;
+      pointer-events: none;
+      animation: hud-pulse 4s ease-in-out infinite;
+    }
+    .hud-corner.tl { top: 14px; left: 14px; border-right: none; border-bottom: none; }
+    .hud-corner.tr { top: 14px; right: 14px; border-left: none; border-bottom: none; }
+    .hud-corner.bl { bottom: 14px; left: 14px; border-right: none; border-top: none; }
+    .hud-corner.br { bottom: 14px; right: 14px; border-left: none; border-top: none; }
+    #hud-sweep {
+      position: fixed;
+      left: 0; right: 0; top: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,136,.6), transparent);
+      box-shadow: 0 0 12px rgba(0,255,136,.5);
+      z-index: 499;
+      pointer-events: none;
+      animation: hud-sweep 9s linear infinite;
+    }
+    @media (max-width: 600px) {
+      .hud-corner { display: none; }
+    }
+
+    /* ── CUSTOM CURSOR GLOW (pointer devices only) ── */
+    #cursor-glow {
+      position: fixed;
+      top: 0; left: 0;
+      width: 26px; height: 26px;
+      margin: -13px 0 0 -13px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,255,136,.35), transparent 70%);
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-100px,-100px);
+      transition: opacity .3s;
+      opacity: 0;
+      mix-blend-mode: screen;
+    }
+    #cursor-ring {
+      position: fixed;
+      top: 0; left: 0;
+      width: 16px; height: 16px;
+      margin: -8px 0 0 -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,255,136,.6);
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-100px,-100px);
+      transition: opacity .3s, width .2s, height .2s, margin .2s, border-color .2s;
+      opacity: 0;
+    }
+    #cursor-ring.hover { width: 34px; height: 34px; margin: -17px 0 0 -17px; border-color: rgba(0,229,255,.8); }
+    body.has-fine-pointer #cursor-glow,
+    body.has-fine-pointer #cursor-ring { opacity: 1; }
+
+    /* ── AMBIENT PARTICLES ── */
+    @keyframes drift-up {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      10%  { opacity: .8; }
+      90%  { opacity: .8; }
+      100% { transform: translateY(-100vh) translateX(var(--dx, 20px)); opacity: 0; }
+    }
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .particle {
+      position: absolute;
+      bottom: -10px;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--g);
+      box-shadow: 0 0 6px var(--g), 0 0 12px rgba(0,255,136,.4);
+      animation: drift-up linear infinite;
+    }
+
+    /* ── 3D TILT CARDS ── */
+    .tilt {
+      transform-style: preserve-3d;
+      transition: transform .15s ease-out;
+      will-change: transform;
+      position: relative;
+    }
+    .tilt::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.10), transparent 55%);
+      opacity: 0;
+      transition: opacity .25s;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .tilt:hover::before { opacity: 1; }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 <body>
@@ -851,6 +972,18 @@
 <canvas id="mx"></canvas>
 <div id="sl"></div>
 <div id="glow"></div>
+<div id="particles"></div>
+
+<!-- HUD FRAME -->
+<span class="hud-corner tl"></span>
+<span class="hud-corner tr"></span>
+<span class="hud-corner bl"></span>
+<span class="hud-corner br"></span>
+<div id="hud-sweep"></div>
+
+<!-- CUSTOM CURSOR -->
+<div id="cursor-glow"></div>
+<div id="cursor-ring"></div>
 
 <!-- MAIN WRAPPER -->
 <div id="wrap">
@@ -877,7 +1010,7 @@
     <div id="role"></div>
 
     <!-- J.A.R.V.I.S. WIDGET -->
-    <div id="jarvis">
+    <div id="jarvis" class="tilt reveal">
       <span class="jv-corner tl"></span>
       <span class="jv-corner tr"></span>
       <span class="jv-corner bl"></span>
@@ -914,19 +1047,19 @@
     </div>
 
     <div id="stats">
-      <div class="stat">
+      <div class="stat reveal">
         <div class="sl">UPTIME</div>
         <div class="sv c" id="uptime">00:00:00</div>
       </div>
-      <div class="stat">
+      <div class="stat reveal">
         <div class="sl">STATUS</div>
         <div class="sv g">SECURE</div>
       </div>
-      <div class="stat">
+      <div class="stat reveal">
         <div class="sl">CLEARANCE</div>
         <div class="sv">LV.4</div>
       </div>
-      <div class="stat">
+      <div class="stat reveal">
         <div class="sl">THREAT</div>
         <div class="sv g">LOW</div>
       </div>
@@ -945,7 +1078,7 @@
   <!-- LINKS -->
   <div class="sec">// CONTACTOS &amp; REDES</div>
 
-  <a class="li" href="https://www.linkedin.com/in/antoniojrms/" target="_blank" rel="noopener noreferrer">
+  <a class="li tilt reveal" href="https://www.linkedin.com/in/antoniojrms/" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">💼</div>
     <div class="li-txt">
       <div class="li-name">LinkedIn</div>
@@ -954,7 +1087,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <a class="li" href="https://github.com/AntoniojoseRMS" target="_blank" rel="noopener noreferrer">
+  <a class="li tilt reveal" href="https://github.com/AntoniojoseRMS" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">🐙</div>
     <div class="li-txt">
       <div class="li-name">GitHub</div>
@@ -963,7 +1096,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <a class="li" href="mailto:antoniojmoraissalvador@gmail.com">
+  <a class="li tilt reveal" href="mailto:antoniojmoraissalvador@gmail.com">
     <div class="li-ico">✉️</div>
     <div class="li-txt">
       <div class="li-name">E-mail</div>
@@ -972,7 +1105,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <a class="li" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank" rel="noopener noreferrer">
+  <a class="li tilt reveal" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">💬</div>
     <div class="li-txt">
       <div class="li-name">WhatsApp</div>
@@ -981,7 +1114,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <a class="li" href="https://instagram.com/Antoniojrms" target="_blank" rel="noopener noreferrer">
+  <a class="li tilt reveal" href="https://instagram.com/Antoniojrms" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">📸</div>
     <div class="li-txt">
       <div class="li-name">Instagram</div>
@@ -990,7 +1123,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <button class="li" onclick="openM('certs')">
+  <button class="li tilt reveal" onclick="openM('certs')">
     <div class="li-ico">🏅</div>
     <div class="li-txt">
       <div class="li-name">Certificações</div>
@@ -999,7 +1132,7 @@
     <span class="li-arr">›</span>
   </button>
 
-  <button class="li" onclick="openM('edu')">
+  <button class="li tilt reveal" onclick="openM('edu')">
     <div class="li-ico">🎓</div>
     <div class="li-txt">
       <div class="li-name">Formação Académica</div>
@@ -1008,7 +1141,7 @@
     <span class="li-arr">›</span>
   </button>
 
-  <button class="li" onclick="openM('proj')">
+  <button class="li tilt reveal" onclick="openM('proj')">
     <div class="li-ico">🖥️</div>
     <div class="li-txt">
       <div class="li-name">Projetos</div>
@@ -1039,7 +1172,7 @@
 
   <!-- INTERACTIVE TERMINAL -->
   <div class="sec">// INTERACTIVE SHELL</div>
-  <div id="term">
+  <div id="term" class="tilt reveal">
     <div id="th">
       <span class="td tdr"></span>
       <span class="td tdy"></span>
@@ -1056,7 +1189,7 @@
     </div>
   </div>
 
-  <footer>// © 2026 ANTÓNIO SALVADOR · INFOSEC · ALL RIGHTS RESERVED //</footer>
+  <footer class="reveal">// © 2026 ANTÓNIO SALVADOR · INFOSEC · ALL RIGHTS RESERVED //</footer>
 </div>
 
 <!-- MODAL CERTS -->
@@ -1460,7 +1593,7 @@ function buildProjCard({ icon, name, desc, lang, liveUrl, ghUrl, badge, updated,
   const langClass = (lang||'').toLowerCase().replace(/[^a-z]/g,'');
   const safeGhUrl = escapeAttr(ghUrl);
   const safeLiveUrl = escapeAttr(liveUrl);
-  return `<div class="proj-card">
+  return `<div class="proj-card tilt">
     <div class="proj-top">
       <div class="proj-icon">${escapeHtml(icon)}</div>
       <div class="proj-info">
@@ -1713,6 +1846,98 @@ async function sendRecado() {
     btnEl.disabled = false;
   }
 }
+
+/* ── CURSOR GLOW (mouse/trackpad only) ── */
+(function() {
+  const isFine = window.matchMedia('(pointer: fine)').matches;
+  if (!isFine) return;
+  document.body.classList.add('has-fine-pointer');
+
+  const glow = document.getElementById('cursor-glow');
+  const ring = document.getElementById('cursor-ring');
+  let mx = -100, my = -100, rx = -100, ry = -100;
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    glow.style.transform = `translate(${mx}px, ${my}px)`;
+    const el = e.target.closest('a, button, input, textarea, .tilt');
+    ring.classList.toggle('hover', !!el);
+  });
+
+  function loop() {
+    rx += (mx - rx) * 0.18;
+    ry += (my - ry) * 0.18;
+    ring.style.transform = `translate(${rx}px, ${ry}px)`;
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ── AMBIENT PARTICLES ── */
+(function() {
+  const wrap = document.getElementById('particles');
+  const COUNT = 24;
+  for (let i = 0; i < COUNT; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const left = Math.random() * 100;
+    const duration = 8 + Math.random() * 14;
+    const delay = Math.random() * 16;
+    const dx = (Math.random() * 60 - 30) + 'px';
+    p.style.left = left + 'vw';
+    p.style.setProperty('--dx', dx);
+    p.style.animationDuration = duration + 's';
+    p.style.animationDelay = delay + 's';
+    wrap.appendChild(p);
+  }
+})();
+
+/* ── 3D TILT + GLARE ── */
+(function() {
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+  const MAX_TILT = 7;
+
+  function bind(el) {
+    el.addEventListener('mousemove', (e) => {
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      const rotY = (px - 0.5) * MAX_TILT * 2;
+      const rotX = (0.5 - py) * MAX_TILT * 2;
+      el.style.transform = `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(0)`;
+      el.style.setProperty('--gx', (px * 100) + '%');
+      el.style.setProperty('--gy', (py * 100) + '%');
+    });
+    el.addEventListener('mouseleave', () => {
+      el.style.transform = 'perspective(700px) rotateX(0) rotateY(0)';
+    });
+  }
+
+  function bindAll() {
+    document.querySelectorAll('.tilt').forEach((el) => {
+      if (el.dataset.tiltBound) return;
+      el.dataset.tiltBound = '1';
+      bind(el);
+    });
+  }
+  bindAll();
+  // Re-bind periodically to catch dynamically-added cards (projects modal)
+  new MutationObserver(bindAll).observe(document.body, { childList: true, subtree: true });
+})();
+
+/* ── SCROLL REVEAL ── */
+(function() {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+})();
 </script>
 </body>
 </html>
