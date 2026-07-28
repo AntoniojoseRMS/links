@@ -868,8 +868,40 @@
       animation: hud-sweep 9s linear infinite;
     }
     @media (max-width: 600px) {
-      .hud-corner { display: none; }
+      .hud-corner { width: 14px; height: 14px; }
+      .hud-corner.tl, .hud-corner.tr { top: 8px; }
+      .hud-corner.bl, .hud-corner.br { bottom: 8px; }
+      .hud-corner.tl, .hud-corner.bl { left: 8px; }
+      .hud-corner.tr, .hud-corner.br { right: 8px; }
     }
+
+    /* ── HOLOGRAPHIC SECTION LABELS ── */
+    @keyframes holo-shift { to { background-position: -200% center; } }
+    .sec span {
+      background: linear-gradient(90deg, var(--g), var(--c), var(--g));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      animation: holo-shift 5s linear infinite;
+      white-space: nowrap;
+    }
+
+    /* ── GLASSMORPHISM PANELS ── */
+    .li, #jarvis, .proj-card, #term, .mbox, .stat {
+      backdrop-filter: blur(10px) saturate(1.3);
+      -webkit-backdrop-filter: blur(10px) saturate(1.3);
+    }
+
+    /* ── NEON FOCUS STATES ── */
+    input:focus, textarea:focus, button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0,255,136,.35), 0 0 16px rgba(0,255,136,.25);
+    }
+
+    /* ── TOUCH GLARE (mobile equivalent of hover glare) ── */
+    .tilt.tilt-active::before { opacity: 1 !important; }
 
     /* ── CUSTOM CURSOR GLOW (pointer devices only) ── */
     #cursor-glow {
@@ -1076,7 +1108,7 @@
   </div>
 
   <!-- LINKS -->
-  <div class="sec">// CONTACTOS &amp; REDES</div>
+  <div class="sec"><span>// CONTACTOS &amp; REDES</span></div>
 
   <a class="li tilt reveal" href="https://www.linkedin.com/in/antoniojrms/" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">💼</div>
@@ -1171,7 +1203,7 @@
   </div>
 
   <!-- INTERACTIVE TERMINAL -->
-  <div class="sec">// INTERACTIVE SHELL</div>
+  <div class="sec"><span>// INTERACTIVE SHELL</span></div>
   <div id="term" class="tilt reveal">
     <div id="th">
       <span class="td tdr"></span>
@@ -1923,6 +1955,73 @@ async function sendRecado() {
   bindAll();
   // Re-bind periodically to catch dynamically-added cards (projects modal)
   new MutationObserver(bindAll).observe(document.body, { childList: true, subtree: true });
+})();
+
+/* ── MOBILE: TOUCH GLARE + GYROSCOPE TILT ── */
+(function() {
+  const isCoarse = window.matchMedia('(pointer: coarse)').matches;
+  if (!isCoarse) return;
+
+  function setGlare(el, x, y) {
+    const r = el.getBoundingClientRect();
+    const px = (x - r.left) / r.width;
+    const py = (y - r.top) / r.height;
+    el.style.setProperty('--gx', (px * 100) + '%');
+    el.style.setProperty('--gy', (py * 100) + '%');
+  }
+
+  function bindTouch(el) {
+    el.addEventListener('touchstart', (e) => {
+      el.classList.add('tilt-active');
+      const t = e.touches[0];
+      if (t) setGlare(el, t.clientX, t.clientY);
+    }, { passive: true });
+    el.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      if (t) setGlare(el, t.clientX, t.clientY);
+    }, { passive: true });
+    el.addEventListener('touchend', () => {
+      setTimeout(() => el.classList.remove('tilt-active'), 300);
+    });
+  }
+
+  function bindAllTouch() {
+    document.querySelectorAll('.tilt').forEach((el) => {
+      if (el.dataset.touchBound) return;
+      el.dataset.touchBound = '1';
+      bindTouch(el);
+    });
+  }
+  bindAllTouch();
+  new MutationObserver(bindAllTouch).observe(document.body, { childList: true, subtree: true });
+
+  // Gentle ambient tilt driven by the phone's gyroscope.
+  let gyroStarted = false;
+  function startGyro() {
+    if (gyroStarted) return;
+    gyroStarted = true;
+    window.addEventListener('deviceorientation', (e) => {
+      const beta = Math.max(-25, Math.min(25, e.beta || 0));
+      const gamma = Math.max(-25, Math.min(25, e.gamma || 0));
+      const rotX = (-beta / 25) * 5;
+      const rotY = (gamma / 25) * 5;
+      document.querySelectorAll('.tilt:not(.tilt-active)').forEach((el) => {
+        el.style.transform = `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+      });
+    });
+  }
+
+  function requestGyro() {
+    document.removeEventListener('touchend', requestGyro);
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission().then((state) => {
+        if (state === 'granted') startGyro();
+      }).catch(() => {});
+    } else {
+      startGyro();
+    }
+  }
+  document.addEventListener('touchend', requestGyro, { once: true });
 })();
 
 /* ── SCROLL REVEAL ── */
