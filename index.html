@@ -573,35 +573,103 @@
     }
 
     /* ── J.A.R.V.I.S. WIDGET ── */
+    @keyframes jv-glow-pulse {
+      0%,100% { box-shadow: 0 0 22px rgba(0,229,255,.08), inset 0 0 40px rgba(0,0,0,.4); border-color: rgba(0,229,255,.2); }
+      50%     { box-shadow: 0 0 38px rgba(0,229,255,.22), inset 0 0 40px rgba(0,0,0,.4); border-color: rgba(0,229,255,.4); }
+    }
+    @keyframes jv-scan {
+      0%   { top: -2px; opacity: 0; }
+      8%   { opacity: 1; }
+      92%  { opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    @keyframes jv-msg-in {
+      from { opacity: 0; transform: translateY(7px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes jv-dot-bounce {
+      0%,60%,100% { opacity: .25; transform: translateY(0); }
+      30%         { opacity: 1; transform: translateY(-3px); }
+    }
+    @keyframes jv-corner-fade {
+      0%,100% { opacity: .35; } 50% { opacity: .9; }
+    }
     #jarvis {
+      position: relative;
       margin-top: 8px;
       border: 1px solid rgba(0,229,255,.2);
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
-      background: rgba(2,8,5,.95);
-      box-shadow: 0 0 40px rgba(0,229,255,.05), inset 0 0 40px rgba(0,0,0,.4);
+      background:
+        linear-gradient(180deg, rgba(0,229,255,.05), transparent 40%),
+        rgba(2,8,5,.96);
+      animation: jv-glow-pulse 4s ease-in-out infinite;
     }
+    #jarvis::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.9), transparent);
+      box-shadow: 0 0 8px rgba(0,229,255,.8);
+      pointer-events: none;
+      animation: jv-scan 5s linear infinite;
+      z-index: 3;
+    }
+    .jv-corner {
+      position: absolute;
+      width: 10px; height: 10px;
+      border: 1px solid rgba(0,229,255,.5);
+      animation: jv-corner-fade 3s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .jv-corner.tl { top: 4px; left: 4px; border-right: none; border-bottom: none; }
+    .jv-corner.tr { top: 4px; right: 4px; border-left: none; border-bottom: none; }
+    .jv-corner.bl { bottom: 4px; left: 4px; border-right: none; border-top: none; }
+    .jv-corner.br { bottom: 4px; right: 4px; border-left: none; border-top: none; }
     #jv-head {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 10px;
       padding: 10px 14px;
-      background: rgba(0,229,255,.06);
-      border-bottom: 1px solid rgba(0,229,255,.12);
+      background: linear-gradient(90deg, rgba(0,229,255,.1), rgba(0,229,255,.02));
+      border-bottom: 1px solid rgba(0,229,255,.15);
     }
+    #jv-avatar-wrap {
+      position: relative;
+      width: 34px; height: 34px;
+      flex-shrink: 0;
+    }
+    .jv-ring {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .jv-ring.r1 { inset: -3px; border: 1px dashed rgba(0,229,255,.55); animation: spin 7s linear infinite; }
+    .jv-ring.r2 { inset: -7px; border: 1px solid rgba(0,229,255,.18); animation: spin 14s linear infinite reverse; }
     #jv-avatar {
-      width: 30px; height: 30px;
+      width: 34px; height: 34px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, #0d3742, #05141a);
-      border: 1px solid rgba(0,229,255,.4);
+      border: 1px solid rgba(0,229,255,.5);
       display: flex; align-items: center; justify-content: center;
       font-family: var(--orb);
       font-weight: 900;
+      font-size: 13px;
       color: var(--c);
       text-shadow: 0 0 10px var(--c);
-      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
     }
-    #jv-name { font-size: 12px; font-weight: 600; color: var(--c); letter-spacing: 1px; }
+    #jv-avatar::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,255,.9), transparent);
+      animation: scan 2.6s ease-in-out infinite;
+    }
+    #jv-name { font-size: 12px; font-weight: 600; color: var(--c); letter-spacing: 1.5px; }
     #jv-status { font-size: 9px; color: var(--td); margin-top: 1px; }
     #jv-status .blink-dot { background: var(--c); box-shadow: 0 0 7px var(--c); }
     #jv-msgs {
@@ -613,6 +681,8 @@
       overflow-y: auto;
       font-size: 12px;
       line-height: 1.55;
+      position: relative;
+      z-index: 1;
     }
     #jv-msgs::-webkit-scrollbar { width: 3px; }
     #jv-msgs::-webkit-scrollbar-thumb { background: rgba(0,229,255,.18); }
@@ -622,11 +692,13 @@
       border-radius: 8px;
       word-wrap: break-word;
       white-space: pre-wrap;
+      animation: jv-msg-in .32s ease both;
     }
     .jv-msg.bot {
       align-self: flex-start;
-      background: rgba(0,229,255,.07);
-      border: 1px solid rgba(0,229,255,.18);
+      background: rgba(0,229,255,.08);
+      border: 1px solid rgba(0,229,255,.2);
+      box-shadow: 0 0 14px rgba(0,229,255,.06);
       color: var(--t);
       border-bottom-left-radius: 2px;
     }
@@ -634,12 +706,63 @@
       align-self: flex-end;
       background: rgba(0,255,136,.09);
       border: 1px solid rgba(0,255,136,.22);
+      box-shadow: 0 0 14px rgba(0,255,136,.05);
       color: var(--t);
       border-bottom-right-radius: 2px;
     }
     .jv-msg.err { color: var(--r); border-color: rgba(255,68,102,.3); background: rgba(255,68,102,.06); }
-    #jv-typing { padding: 0 14px 8px; font-size: 11px; color: var(--td); }
-    #jv-form { display: flex; align-items: center; border-top: 1px solid rgba(0,229,255,.09); padding: 8px 10px; gap: 8px; }
+
+    /* Suggestion chips */
+    #jv-suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 0 14px 10px;
+    }
+    .jv-chip {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: .3px;
+      color: var(--c);
+      background: rgba(0,229,255,.06);
+      border: 1px solid rgba(0,229,255,.25);
+      border-radius: 20px;
+      padding: 5px 11px;
+      cursor: pointer;
+      transition: background .2s, border-color .2s, transform .15s;
+    }
+    .jv-chip:hover { background: rgba(0,229,255,.16); border-color: rgba(0,229,255,.5); transform: translateY(-1px); }
+    .jv-chip:disabled { opacity: .4; cursor: default; transform: none; }
+
+    #jv-typing {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 14px 8px;
+      font-size: 10px;
+      letter-spacing: .5px;
+      color: var(--c);
+    }
+    .jv-dots { display: inline-flex; gap: 3px; }
+    .jv-dots span {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--c);
+      box-shadow: 0 0 6px var(--c);
+      animation: jv-dot-bounce 1.1s ease-in-out infinite;
+    }
+    .jv-dots span:nth-child(2) { animation-delay: .15s; }
+    .jv-dots span:nth-child(3) { animation-delay: .3s; }
+
+    #jv-form {
+      position: relative;
+      display: flex;
+      align-items: center;
+      border-top: 1px solid rgba(0,229,255,.12);
+      padding: 8px 10px;
+      gap: 8px;
+      z-index: 1;
+    }
     #jv-input {
       flex: 1;
       background: transparent;
@@ -653,21 +776,23 @@
     #jv-input::placeholder { color: rgba(0,229,255,.25); }
     #jv-send {
       background: rgba(0,229,255,.1);
-      border: 1px solid rgba(0,229,255,.3);
+      border: 1px solid rgba(0,229,255,.35);
       color: var(--c);
-      border-radius: 5px;
+      border-radius: 6px;
       width: 30px; height: 30px;
       cursor: pointer;
       font-size: 13px;
       flex-shrink: 0;
+      transition: background .2s, box-shadow .2s;
     }
-    #jv-send:hover { background: rgba(0,229,255,.2); }
-    #jv-send:disabled { opacity: .4; cursor: default; }
+    #jv-send:hover { background: rgba(0,229,255,.22); box-shadow: 0 0 12px rgba(0,229,255,.3); }
+    #jv-send:disabled { opacity: .4; cursor: default; box-shadow: none; }
     #jv-leave-msg {
+      position: relative;
       width: 100%;
       background: rgba(0,229,255,.05);
       border: none;
-      border-top: 1px solid rgba(0,229,255,.09);
+      border-top: 1px solid rgba(0,229,255,.12);
       color: var(--c);
       font-family: var(--mono);
       font-size: 11px;
@@ -675,8 +800,10 @@
       padding: 9px 14px;
       cursor: pointer;
       text-align: center;
+      transition: background .2s;
+      z-index: 1;
     }
-    #jv-leave-msg:hover { background: rgba(0,229,255,.1); }
+    #jv-leave-msg:hover { background: rgba(0,229,255,.12); }
 
     /* Recado modal */
     #rc-nome, #rc-msg {
@@ -751,8 +878,16 @@
 
     <!-- J.A.R.V.I.S. WIDGET -->
     <div id="jarvis">
+      <span class="jv-corner tl"></span>
+      <span class="jv-corner tr"></span>
+      <span class="jv-corner bl"></span>
+      <span class="jv-corner br"></span>
       <div id="jv-head">
-        <div id="jv-avatar">J</div>
+        <div id="jv-avatar-wrap">
+          <div class="jv-ring r2"></div>
+          <div class="jv-ring r1"></div>
+          <div id="jv-avatar">J</div>
+        </div>
         <div>
           <div id="jv-name">J.A.R.V.I.S.</div>
           <div id="jv-status"><span class="blink-dot"></span>Assistente virtual do António — online</div>
@@ -761,7 +896,16 @@
       <div id="jv-msgs">
         <div class="jv-msg bot">Olá, eu sou o J.A.R.V.I.S., assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.</div>
       </div>
-      <div id="jv-typing" style="display:none;">J.A.R.V.I.S. está digitando…</div>
+      <div id="jv-suggestions">
+        <button class="jv-chip" type="button" data-q="Qual é o cargo atual dele?">💼 Cargo atual</button>
+        <button class="jv-chip" type="button" data-q="Quais certificações ele tem?">🏅 Certificações</button>
+        <button class="jv-chip" type="button" data-q="Quais idiomas ele fala?">🌐 Idiomas</button>
+        <button class="jv-chip" type="button" data-q="Qual a formação acadêmica dele?">🎓 Formação</button>
+      </div>
+      <div id="jv-typing" style="display:none;">
+        <span class="jv-dots"><span></span><span></span><span></span></span>
+        J.A.R.V.I.S. ESTÁ PROCESSANDO
+      </div>
       <form id="jv-form">
         <input id="jv-input" type="text" placeholder="Pergunte algo ao J.A.R.V.I.S..." autocomplete="off" maxlength="300"/>
         <button type="submit" id="jv-send">➤</button>
@@ -1465,6 +1609,7 @@ const NTFY_URL = 'https://ntfy.sh/' + NTFY_TOPIC;
   const inputEl = document.getElementById('jv-input');
   const sendBtn = document.getElementById('jv-send');
   const typingEl = document.getElementById('jv-typing');
+  const chipsEl = document.getElementById('jv-suggestions');
 
   const history = [];
 
@@ -1476,17 +1621,17 @@ const NTFY_URL = 'https://ntfy.sh/' + NTFY_TOPIC;
     msgsEl.scrollTop = msgsEl.scrollHeight;
   }
 
-  formEl.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const text = inputEl.value.trim();
-    if (!text) return;
+  function setBusy(busy) {
+    inputEl.disabled = busy;
+    sendBtn.disabled = busy;
+    typingEl.style.display = busy ? 'flex' : 'none';
+    chipsEl.querySelectorAll('.jv-chip').forEach((c) => { c.disabled = busy; });
+  }
 
+  async function ask(text) {
     addMsg('user', text);
     history.push({ role: 'user', content: text });
-    inputEl.value = '';
-    inputEl.disabled = true;
-    sendBtn.disabled = true;
-    typingEl.style.display = 'block';
+    setBusy(true);
 
     try {
       if (JARVIS_WORKER_URL.includes('REPLACE-WITH-YOUR-WORKER-URL')) {
@@ -1505,11 +1650,23 @@ const NTFY_URL = 'https://ntfy.sh/' + NTFY_TOPIC;
     } catch (e) {
       addMsg('err', 'J.A.R.V.I.S. está indisponível no momento. Deixe um recado pelo botão abaixo ou contacte o António diretamente.');
     } finally {
-      inputEl.disabled = false;
-      sendBtn.disabled = false;
-      typingEl.style.display = 'none';
+      setBusy(false);
       inputEl.focus();
     }
+  }
+
+  formEl.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = inputEl.value.trim();
+    if (!text) return;
+    inputEl.value = '';
+    ask(text);
+  });
+
+  chipsEl.addEventListener('click', (e) => {
+    const chip = e.target.closest('.jv-chip');
+    if (!chip || chip.disabled) return;
+    ask(chip.dataset.q);
   });
 })();
 
