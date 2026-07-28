@@ -1,6 +1,8 @@
 // J.A.R.V.I.S. — proxy do portfólio de António Salvador
 // Deploy: Cloudflare Workers (dashboard > Workers & Pages > Create > cole este código)
-// Segredo necessário: ANTHROPIC_API_KEY (Settings > Variables and Secrets > Add > Secret)
+// 100% gratuito — usa a Cloudflare Workers AI (modelo open-source), sem chave paga.
+// Necessário: adicionar o binding "AI" ao Worker (Settings > Bindings > Add >
+// Workers AI > variável "AI") — nenhuma chave/secret precisa ser criada.
 //
 // Depois de publicar, copie a URL do Worker (algo como
 // https://jarvis-portfolio.SEU-SUBDOMINIO.workers.dev) e cole em
@@ -129,33 +131,20 @@ export default {
     }
 
     try {
-      const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'x-api-key': env.ANTHROPIC_API_KEY,
-          'anthropic-version': '2023-06-01',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 400,
-          system: SYSTEM_PROMPT,
-          messages,
-        }),
+      const aiMessages = [{ role: 'system', content: SYSTEM_PROMPT }, ...messages];
+
+      // Modelo open-source gratuito via Cloudflare Workers AI (binding "AI").
+      const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+        messages: aiMessages,
+        max_tokens: 400,
       });
 
-      if (!apiRes.ok) {
-        console.error('Anthropic API error', apiRes.status, await apiRes.text());
-        return jsonResponse({ reply: 'J.A.R.V.I.S. teve um problema ao pensar. Tente novamente em instantes.' }, 502, corsHeaders);
-      }
-
-      const data = await apiRes.json();
-      const reply = data?.content?.[0]?.text || 'Desculpe, não consegui gerar uma resposta agora.';
+      const reply = result?.response?.trim() || 'Desculpe, não consegui gerar uma resposta agora.';
 
       return jsonResponse({ reply }, 200, corsHeaders);
     } catch (e) {
-      console.error('Worker internal error', e);
-      return jsonResponse({ reply: 'Erro interno ao processar a solicitação.' }, 500, corsHeaders);
+      console.error('Workers AI error', e);
+      return jsonResponse({ reply: 'J.A.R.V.I.S. teve um problema ao pensar. Tente novamente em instantes.' }, 502, corsHeaders);
     }
   },
 };
