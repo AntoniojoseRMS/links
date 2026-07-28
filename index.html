@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://unpkg.com; connect-src 'self' https://ipwho.is https://ntfy.sh https://api.github.com https://*.workers.dev https://unpkg.com; object-src 'none'; base-uri 'self'; form-action 'self';"/>
   <title>António Salvador // INFOSEC</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -570,6 +571,144 @@
       .lf { display: none; }
       #gname { font-size: 16px; letter-spacing: 2px; }
     }
+
+    /* ── J.A.R.V.I.S. WIDGET ── */
+    #jarvis {
+      margin-top: 8px;
+      border: 1px solid rgba(0,229,255,.2);
+      border-radius: 8px;
+      overflow: hidden;
+      background: rgba(2,8,5,.95);
+      box-shadow: 0 0 40px rgba(0,229,255,.05), inset 0 0 40px rgba(0,0,0,.4);
+    }
+    #jv-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      background: rgba(0,229,255,.06);
+      border-bottom: 1px solid rgba(0,229,255,.12);
+    }
+    #jv-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #0d3742, #05141a);
+      border: 1px solid rgba(0,229,255,.4);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--orb);
+      font-weight: 900;
+      color: var(--c);
+      text-shadow: 0 0 10px var(--c);
+      flex-shrink: 0;
+    }
+    #jv-name { font-size: 12px; font-weight: 600; color: var(--c); letter-spacing: 1px; }
+    #jv-status { font-size: 9px; color: var(--td); margin-top: 1px; }
+    #jv-status .blink-dot { background: var(--c); box-shadow: 0 0 7px var(--c); }
+    #jv-msgs {
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+    #jv-msgs::-webkit-scrollbar { width: 3px; }
+    #jv-msgs::-webkit-scrollbar-thumb { background: rgba(0,229,255,.18); }
+    .jv-msg {
+      max-width: 88%;
+      padding: 8px 11px;
+      border-radius: 8px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    .jv-msg.bot {
+      align-self: flex-start;
+      background: rgba(0,229,255,.07);
+      border: 1px solid rgba(0,229,255,.18);
+      color: var(--t);
+      border-bottom-left-radius: 2px;
+    }
+    .jv-msg.user {
+      align-self: flex-end;
+      background: rgba(0,255,136,.09);
+      border: 1px solid rgba(0,255,136,.22);
+      color: var(--t);
+      border-bottom-right-radius: 2px;
+    }
+    .jv-msg.err { color: var(--r); border-color: rgba(255,68,102,.3); background: rgba(255,68,102,.06); }
+    #jv-typing { padding: 0 14px 8px; font-size: 11px; color: var(--td); }
+    #jv-form { display: flex; align-items: center; border-top: 1px solid rgba(0,229,255,.09); padding: 8px 10px; gap: 8px; }
+    #jv-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--t);
+      font-family: var(--mono);
+      font-size: 12px;
+      caret-color: var(--c);
+    }
+    #jv-input::placeholder { color: rgba(0,229,255,.25); }
+    #jv-send {
+      background: rgba(0,229,255,.1);
+      border: 1px solid rgba(0,229,255,.3);
+      color: var(--c);
+      border-radius: 5px;
+      width: 30px; height: 30px;
+      cursor: pointer;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    #jv-send:hover { background: rgba(0,229,255,.2); }
+    #jv-send:disabled { opacity: .4; cursor: default; }
+    #jv-leave-msg {
+      width: 100%;
+      background: rgba(0,229,255,.05);
+      border: none;
+      border-top: 1px solid rgba(0,229,255,.09);
+      color: var(--c);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .5px;
+      padding: 9px 14px;
+      cursor: pointer;
+      text-align: center;
+    }
+    #jv-leave-msg:hover { background: rgba(0,229,255,.1); }
+
+    /* Recado modal */
+    #rc-nome, #rc-msg {
+      width: 100%;
+      background: rgba(0,255,136,.025);
+      border: 1px solid rgba(0,255,136,.15);
+      border-radius: 5px;
+      color: var(--t);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 9px 11px;
+      outline: none;
+      margin-bottom: 10px;
+    }
+    #rc-msg { min-height: 90px; resize: vertical; }
+    #rc-nome:focus, #rc-msg:focus { border-color: rgba(0,255,136,.4); }
+    #rc-send {
+      width: 100%;
+      background: var(--g);
+      color: var(--bg);
+      border: none;
+      border-radius: 5px;
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: .5px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    #rc-send:hover { background: #00e87a; }
+    #rc-send:disabled { opacity: .5; cursor: default; }
+    #rc-status { font-size: 11px; margin-top: 8px; text-align: center; min-height: 14px; }
   </style>
 </head>
 <body>
@@ -610,6 +749,26 @@
     <div id="gname" data-t="ANTÓNIO SALVADOR">ANTÓNIO SALVADOR</div>
     <div id="role"></div>
 
+    <!-- J.A.R.V.I.S. WIDGET -->
+    <div id="jarvis">
+      <div id="jv-head">
+        <div id="jv-avatar">J</div>
+        <div>
+          <div id="jv-name">J.A.R.V.I.S.</div>
+          <div id="jv-status"><span class="blink-dot"></span>Assistente virtual do António — online</div>
+        </div>
+      </div>
+      <div id="jv-msgs">
+        <div class="jv-msg bot">Olá, eu sou o J.A.R.V.I.S., assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.</div>
+      </div>
+      <div id="jv-typing" style="display:none;">J.A.R.V.I.S. está digitando…</div>
+      <form id="jv-form">
+        <input id="jv-input" type="text" placeholder="Pergunte algo ao J.A.R.V.I.S..." autocomplete="off" maxlength="300"/>
+        <button type="submit" id="jv-send">➤</button>
+      </form>
+      <button id="jv-leave-msg" type="button" onclick="openM('recado')">📨 Deixar recado para o António</button>
+    </div>
+
     <div id="stats">
       <div class="stat">
         <div class="sl">UPTIME</div>
@@ -642,7 +801,7 @@
   <!-- LINKS -->
   <div class="sec">// CONTACTOS &amp; REDES</div>
 
-  <a class="li" href="https://www.linkedin.com/in/antoniojrms/" target="_blank">
+  <a class="li" href="https://www.linkedin.com/in/antoniojrms/" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">💼</div>
     <div class="li-txt">
       <div class="li-name">LinkedIn</div>
@@ -651,7 +810,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <a class="li" href="https://github.com/AntoniojoseRMS" target="_blank">
+  <a class="li" href="https://github.com/AntoniojoseRMS" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">🐙</div>
     <div class="li-txt">
       <div class="li-name">GitHub</div>
@@ -669,7 +828,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <a class="li" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank">
+  <a class="li" href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">💬</div>
     <div class="li-txt">
       <div class="li-name">WhatsApp</div>
@@ -678,7 +837,7 @@
     <span class="li-arr">›</span>
   </a>
 
-  <a class="li" href="https://instagram.com/Antoniojrms" target="_blank">
+  <a class="li" href="https://instagram.com/Antoniojrms" target="_blank" rel="noopener noreferrer">
     <div class="li-ico">📸</div>
     <div class="li-txt">
       <div class="li-name">Instagram</div>
@@ -717,19 +876,19 @@
 
   <!-- SOCIAL ICONS -->
   <div id="socials">
-    <a href="https://www.linkedin.com/in/antoniojrms/" target="_blank" title="LinkedIn">
+    <a href="https://www.linkedin.com/in/antoniojrms/" target="_blank" rel="noopener noreferrer" title="LinkedIn">
       <ion-icon name="logo-linkedin"></ion-icon>
     </a>
-    <a href="https://github.com/AntoniojoseRMS" target="_blank" title="GitHub">
+    <a href="https://github.com/AntoniojoseRMS" target="_blank" rel="noopener noreferrer" title="GitHub">
       <ion-icon name="logo-github"></ion-icon>
     </a>
     <a href="mailto:antoniojmoraissalvador@gmail.com" title="E-mail">
       <ion-icon name="mail-outline"></ion-icon>
     </a>
-    <a href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank" title="WhatsApp">
+    <a href="https://api.whatsapp.com/send/?phone=5551991707737" target="_blank" rel="noopener noreferrer" title="WhatsApp">
       <ion-icon name="logo-whatsapp"></ion-icon>
     </a>
-    <a href="https://instagram.com/Antoniojrms" target="_blank" title="Instagram">
+    <a href="https://instagram.com/Antoniojrms" target="_blank" rel="noopener noreferrer" title="Instagram">
       <ion-icon name="logo-instagram"></ion-icon>
     </a>
   </div>
@@ -768,25 +927,25 @@
       <div class="cn">CRPO — Certified Ransomware Protection Officer</div>
       <div class="ci">ICTTF - United for Digital Resilience</div>
       <div class="cd">fev. 2026 · ID: 64d63660ac9488bbf50f3e76</div>
-      <a class="cl" href="https://mycourse.app/cuewiFxSN4aozzbr1" target="_blank">▸ VER CREDENCIAL</a>
+      <a class="cl" href="https://mycourse.app/cuewiFxSN4aozzbr1" target="_blank" rel="noopener noreferrer">▸ VER CREDENCIAL</a>
     </div>
     <div class="cc">
       <div class="cn">Introduction to Cybersecurity</div>
       <div class="ci">Cisco</div>
       <div class="cd">fev. 2026</div>
-      <a class="cl" href="https://www.credly.com/badges/b3bd9674-3b27-4a63-b90f-cad1fb4c59a2/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
+      <a class="cl" href="https://www.credly.com/badges/b3bd9674-3b27-4a63-b90f-cad1fb4c59a2/linked_in_profile" target="_blank" rel="noopener noreferrer">▸ VER CREDENCIAL</a>
     </div>
     <div class="cc">
       <div class="cn">Segurança em Linux</div>
       <div class="ci">IBSEC - Instituto Brasileiro de Cibersegurança</div>
       <div class="cd">fev. 2026</div>
-      <a class="cl" href="https://certs.ibsec.com.br?cert_hash=c9966ec4d0b375a0" target="_blank">▸ VER CREDENCIAL</a>
+      <a class="cl" href="https://certs.ibsec.com.br?cert_hash=c9966ec4d0b375a0" target="_blank" rel="noopener noreferrer">▸ VER CREDENCIAL</a>
     </div>
     <div class="cc">
       <div class="cn">Getting Started in Cybersecurity 3.0</div>
       <div class="ci">Fortinet</div>
       <div class="cd">fev. 2026</div>
-      <a class="cl" href="https://www.credly.com/badges/13ec5088-ef79-4844-a36c-31bb2120385e/linked_in_profile" target="_blank">▸ VER CREDENCIAL</a>
+      <a class="cl" href="https://www.credly.com/badges/13ec5088-ef79-4844-a36c-31bb2120385e/linked_in_profile" target="_blank" rel="noopener noreferrer">▸ VER CREDENCIAL</a>
     </div>
     <div class="cc"><div class="cn">Introdução ao Sistema Operacional Linux</div><div class="ci">Udemy</div><div class="cd">jan. 2026</div></div>
     <div class="cc"><div class="cn">Hacker Ético Profissional com Kali Linux v2023</div><div class="ci">Udemy</div><div class="cd">mai. 2023</div></div>
@@ -803,20 +962,32 @@
       <div class="cn">MBA em Cybersecurity e Cybercrimes</div>
       <div class="ci">Anhanguera Educacional</div>
       <div class="cd">Jul 2023 – Dez 2023 · Pós-graduação · Concluído</div>
-      <a class="cl" href="https://antoniojoserms.github.io/links/Cybersecurity%20e%20cybercrimes.pdf" target="_blank">▸ VER CERTIFICADO</a>
+      <a class="cl" href="https://antoniojoserms.github.io/links/Cybersecurity%20e%20cybercrimes.pdf" target="_blank" rel="noopener noreferrer">▸ VER CERTIFICADO</a>
     </div>
     <div class="cc">
       <div class="cn">Graphic Design</div>
       <div class="ci">Anhanguera Educacional</div>
       <div class="cd">Nov 2023 – Mai 2024 · Pós-graduação · Concluído</div>
-      <a class="cl" href="https://antoniojoserms.github.io/links/Design%20Gr%C3%A1fico.pdf" target="_blank">▸ VER CERTIFICADO</a>
+      <a class="cl" href="https://antoniojoserms.github.io/links/Design%20Gra%CC%81fico.pdf" target="_blank" rel="noopener noreferrer">▸ VER CERTIFICADO</a>
     </div>
     <div class="cc">
       <div class="cn">Análise e Desenvolvimento de Sistemas</div>
       <div class="ci">Estácio</div>
       <div class="cd">Jan 2021 – Jul 2023 · Bacharelado · Concluído</div>
-      <a class="cl" href="https://antoniojoserms.github.io/links/ADS.pdf" target="_blank">▸ VER CERTIFICADO</a>
+      <a class="cl" href="https://antoniojoserms.github.io/links/ADS.pdf" target="_blank" rel="noopener noreferrer">▸ VER CERTIFICADO</a>
     </div>
+  </div>
+</div>
+
+<!-- MODAL RECADO -->
+<div id="m-recado" class="mov" onclick="overlayClick(event,'recado')">
+  <div class="mbox">
+    <button class="mc" onclick="closeM('recado')">✕</button>
+    <div class="mt">// Deixar recado para o António //</div>
+    <input id="rc-nome" type="text" placeholder="Seu nome (opcional)" maxlength="60"/>
+    <textarea id="rc-msg" placeholder="Escreva sua mensagem..." maxlength="600"></textarea>
+    <button id="rc-send" onclick="sendRecado()">Enviar recado</button>
+    <div id="rc-status"></div>
   </div>
 </div>
 
@@ -979,7 +1150,7 @@ function overlayClick(e, id) {
   if (e.target === document.getElementById('m-' + id)) closeM(id);
 }
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeM('certs'); closeM('edu'); }
+  if (e.key === 'Escape') { closeM('certs'); closeM('edu'); closeM('recado'); closeM('proj'); }
 });
 
 /* ── INTERACTIVE TERMINAL ── */
@@ -1128,25 +1299,40 @@ const EXTRA_PROJECTS = [
   },
 ];
 
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+
+function escapeAttr(str) {
+  // Só permite URLs http(s) — bloqueia javascript: e outros esquemas perigosos.
+  const s = String(str ?? '');
+  if (!/^https?:\/\//i.test(s)) return '';
+  return escapeHtml(s);
+}
+
 function buildProjCard({ icon, name, desc, lang, liveUrl, ghUrl, badge, updated, stars }) {
   const langClass = (lang||'').toLowerCase().replace(/[^a-z]/g,'');
+  const safeGhUrl = escapeAttr(ghUrl);
+  const safeLiveUrl = escapeAttr(liveUrl);
   return `<div class="proj-card">
     <div class="proj-top">
-      <div class="proj-icon">${icon}</div>
+      <div class="proj-icon">${escapeHtml(icon)}</div>
       <div class="proj-info">
-        <div class="proj-name">${name}</div>
-        <div class="proj-desc">${desc}</div>
+        <div class="proj-name">${escapeHtml(name)}</div>
+        <div class="proj-desc">${escapeHtml(desc)}</div>
       </div>
     </div>
     <div class="proj-meta">
-      ${lang ? `<span class="proj-lang ${langClass}">${lang}</span>` : ''}
-      ${badge ? `<span class="proj-lang" style="color:var(--c);border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.06);">${badge}</span>` : ''}
-      ${updated ? `<span style="font-size:10px;color:var(--td);">Atualizado: ${updated}</span>` : ''}
-      ${stars > 0 ? `<span style="font-size:10px;color:var(--td);">⭐ ${stars}</span>` : ''}
+      ${lang ? `<span class="proj-lang ${escapeHtml(langClass)}">${escapeHtml(lang)}</span>` : ''}
+      ${badge ? `<span class="proj-lang" style="color:var(--c);border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.06);">${escapeHtml(badge)}</span>` : ''}
+      ${updated ? `<span style="font-size:10px;color:var(--td);">Atualizado: ${escapeHtml(updated)}</span>` : ''}
+      ${stars > 0 ? `<span style="font-size:10px;color:var(--td);">⭐ ${escapeHtml(stars)}</span>` : ''}
     </div>
     <div class="proj-btns">
-      ${ghUrl  ? `<a class="proj-btn gh"   href="${ghUrl}"  target="_blank">⌥ Ver Código</a>` : ''}
-      ${liveUrl? `<a class="proj-btn live" href="${liveUrl}" target="_blank">▶ Ver ao Vivo</a>` : ''}
+      ${safeGhUrl  ? `<a class="proj-btn gh"   href="${safeGhUrl}"  target="_blank" rel="noopener noreferrer">⌥ Ver Código</a>` : ''}
+      ${safeLiveUrl? `<a class="proj-btn live" href="${safeLiveUrl}" target="_blank" rel="noopener noreferrer">▶ Ver ao Vivo</a>` : ''}
     </div>
   </div>`;
 }
@@ -1182,7 +1368,7 @@ async function loadProjects() {
   } catch(e) {
     // Se a API falhar, mostra pelo menos os extras
     const extraHtml = EXTRA_PROJECTS.map(p => buildProjCard(p)).join('');
-    el.innerHTML = extraHtml + `<div class="proj-loading" style="margin-top:10px;">Não foi possível carregar repositórios GitHub.<br><span style="color:var(--r);font-size:10px;">${e.message}</span></div>`;
+    el.innerHTML = extraHtml + `<div class="proj-loading" style="margin-top:10px;">Não foi possível carregar repositórios GitHub.<br><span style="color:var(--r);font-size:10px;">${escapeHtml(e.message)}</span></div>`;
     projLoaded = true;
   }
 }
@@ -1193,6 +1379,183 @@ window.openM = function(id) {
   _openM(id);
   if (id === 'proj') loadProjects();
 };
+
+/* ── CONFIG COMPARTILHADA (ntfy.sh) ── */
+const NTFY_TOPIC = 'antonio-portfolio-d82271601989';
+const NTFY_URL = 'https://ntfy.sh/' + NTFY_TOPIC;
+
+/* ── NOTIFICAÇÃO DE ACESSO (ntfy.sh) ── */
+(function() {
+  function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
+    let browser = 'Desconhecido';
+    if (ua.includes('Edg/')) browser = 'Edge';
+    else if (ua.includes('OPR/') || ua.includes('Opera')) browser = 'Opera';
+    else if (ua.includes('Firefox/')) browser = 'Firefox';
+    else if (ua.includes('Chrome/')) browser = 'Chrome';
+    else if (ua.includes('Safari/')) browser = 'Safari';
+    let os = 'Desconhecido';
+    if (ua.includes('Windows')) os = 'Windows';
+    else if (ua.includes('Mac OS')) os = 'macOS';
+    else if (ua.includes('Android')) os = 'Android';
+    else if (/iPhone|iPad/.test(ua)) os = 'iOS';
+    else if (ua.includes('Linux')) os = 'Linux';
+    return {
+      browser, os, isMobile,
+      screenInfo: `${screen.width}x${screen.height}`,
+      lang: navigator.language || '',
+    };
+  }
+
+  async function getLocation() {
+    try {
+      const res = await fetch('https://ipwho.is/');
+      const data = await res.json();
+      if (!data.success) return null;
+      return {
+        ip: data.ip,
+        city: data.city,
+        region: data.region,
+        country: data.country,
+        isp: data.connection && data.connection.isp,
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async function notifyVisit() {
+    const dev = getDeviceInfo();
+    const loc = await getLocation();
+    const deviceLabel = `${dev.os} · ${dev.browser} · ${dev.isMobile ? 'Mobile' : 'Desktop'}`;
+    const locLabel = loc
+      ? `${loc.city || '?'}, ${loc.region || '?'}, ${loc.country || '?'} (IP: ${loc.ip})${loc.isp ? ' · ' + loc.isp : ''}`
+      : 'Localização indisponível';
+
+    const message = [
+      `Dispositivo: ${deviceLabel}`,
+      `Local: ${locLabel}`,
+      `Idioma: ${dev.lang}`,
+      `Tela: ${dev.screenInfo}`,
+      `Referrer: ${document.referrer || 'direto'}`,
+      `Hora: ${new Date().toLocaleString('pt-BR')}`,
+    ].join('\n');
+
+    fetch(NTFY_URL, {
+      method: 'POST',
+      body: message,
+      headers: {
+        'Title': 'Novo acesso ao portfolio',
+        'Tags': 'eyes',
+      },
+    }).catch(() => {});
+  }
+
+  notifyVisit();
+})();
+
+/* ── J.A.R.V.I.S. CHAT (via Cloudflare Worker + Claude API) ── */
+(function() {
+  // Substitua pela URL do seu Worker depois de publicá-lo no Cloudflare.
+  const JARVIS_WORKER_URL = 'https://REPLACE-WITH-YOUR-WORKER-URL.workers.dev';
+
+  const msgsEl = document.getElementById('jv-msgs');
+  const formEl = document.getElementById('jv-form');
+  const inputEl = document.getElementById('jv-input');
+  const sendBtn = document.getElementById('jv-send');
+  const typingEl = document.getElementById('jv-typing');
+
+  const history = [];
+
+  function addMsg(role, text) {
+    const d = document.createElement('div');
+    d.className = 'jv-msg ' + role;
+    d.textContent = text;
+    msgsEl.appendChild(d);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  formEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const text = inputEl.value.trim();
+    if (!text) return;
+
+    addMsg('user', text);
+    history.push({ role: 'user', content: text });
+    inputEl.value = '';
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
+    typingEl.style.display = 'block';
+
+    try {
+      if (JARVIS_WORKER_URL.includes('REPLACE-WITH-YOUR-WORKER-URL')) {
+        throw new Error('worker-not-configured');
+      }
+      const res = await fetch(JARVIS_WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history.slice(-10) }),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      const reply = data.reply || 'Desculpe, não consegui gerar uma resposta agora.';
+      addMsg('bot', reply);
+      history.push({ role: 'assistant', content: reply });
+    } catch (e) {
+      addMsg('err', 'J.A.R.V.I.S. está indisponível no momento. Deixe um recado pelo botão abaixo ou contacte o António diretamente.');
+    } finally {
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      typingEl.style.display = 'none';
+      inputEl.focus();
+    }
+  });
+})();
+
+/* ── ENVIAR RECADO (ntfy.sh) ── */
+async function sendRecado() {
+  const nomeEl = document.getElementById('rc-nome');
+  const msgEl = document.getElementById('rc-msg');
+  const statusEl = document.getElementById('rc-status');
+  const btnEl = document.getElementById('rc-send');
+
+  const nome = nomeEl.value.trim() || 'Visitante anônimo';
+  const msg = msgEl.value.trim();
+
+  if (!msg) {
+    statusEl.textContent = 'Escreva uma mensagem antes de enviar.';
+    statusEl.style.color = 'var(--r)';
+    return;
+  }
+
+  btnEl.disabled = true;
+  statusEl.textContent = 'Enviando...';
+  statusEl.style.color = 'var(--td)';
+
+  const body = [
+    `De: ${nome}`,
+    `Mensagem: ${msg}`,
+    `Hora: ${new Date().toLocaleString('pt-BR')}`,
+  ].join('\n');
+
+  try {
+    await fetch(NTFY_URL, {
+      method: 'POST',
+      body,
+      headers: { 'Title': 'Novo recado de visitante', 'Tags': 'email' },
+    });
+    statusEl.textContent = 'Recado enviado! Obrigado.';
+    statusEl.style.color = 'var(--g)';
+    msgEl.value = '';
+    setTimeout(() => closeM('recado'), 1600);
+  } catch (e) {
+    statusEl.textContent = 'Falha ao enviar. Tente novamente.';
+    statusEl.style.color = 'var(--r)';
+  } finally {
+    btnEl.disabled = false;
+  }
+}
 </script>
 </body>
 </html>
