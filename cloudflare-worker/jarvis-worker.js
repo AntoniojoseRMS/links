@@ -134,7 +134,7 @@ export default {
       const aiMessages = [{ role: 'system', content: SYSTEM_PROMPT }, ...messages];
 
       // Modelo open-source gratuito via Cloudflare Workers AI (binding "AI").
-      const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+      const result = await env.AI.run('@cf/meta/llama-3.1-8b-instruct-fp8', {
         messages: aiMessages,
         max_tokens: 400,
       });
