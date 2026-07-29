@@ -711,6 +711,19 @@
       border-bottom-right-radius: 2px;
     }
     .jv-msg.err { color: var(--r); border-color: rgba(255,68,102,.3); background: rgba(255,68,102,.06); }
+    .jv-decode-cursor {
+      display: inline-block;
+      width: 6px; height: 12px;
+      background: var(--c);
+      box-shadow: 0 0 8px var(--c);
+      margin-left: 2px;
+      vertical-align: -1px;
+      animation: blink-cursor .9s steps(2) infinite;
+    }
+    @keyframes blink-cursor { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    @media (prefers-reduced-motion: reduce) {
+      .jv-decode-cursor { animation: none; }
+    }
 
     /* Suggestion chips */
     #jv-suggestions {
@@ -989,6 +1002,76 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* ── WELCOME CARD ── */
+    #welcome {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translate(-50%, -14px);
+      z-index: 40;
+      width: min(92vw, 380px);
+      background: var(--bg);
+      border: 1px solid var(--b);
+      border-radius: 8px;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.25), 0 24px 60px -24px rgba(0,255,136,0.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .45s ease, transform .45s cubic-bezier(.2,.8,.2,1);
+    }
+    #welcome.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+    }
+    #welcome .w-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--b);
+      font-size: 9.5px;
+      letter-spacing: 1.5px;
+      color: var(--gc);
+    }
+    #welcome .w-close {
+      background: none;
+      border: none;
+      color: var(--td);
+      font-family: var(--mono);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    #welcome .w-close:hover { color: var(--r); }
+    #welcome .w-body { padding: 16px 16px 14px; }
+    #welcome .w-hello {
+      font-size: 14px;
+      color: var(--g);
+      margin: 0 0 12px;
+      letter-spacing: 0.4px;
+    }
+    #welcome .w-rows {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      row-gap: 6px;
+      column-gap: 12px;
+      font-size: 11.5px;
+    }
+    #welcome .w-rows dt { color: var(--td); white-space: nowrap; }
+    #welcome .w-rows dd { margin: 0; color: var(--t); }
+    #welcome .w-foot {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--b);
+      font-size: 9.5px;
+      color: var(--td);
+      line-height: 1.5;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #welcome { transition: none; }
+    }
   </style>
 </head>
 <body>
@@ -998,6 +1081,19 @@
   <div id="boot-text"></div>
   <div id="boot-bar"><div id="boot-fill"></div></div>
   <button id="boot-skip" onclick="skipBoot()">[ESC] SKIP</button>
+</div>
+
+<!-- WELCOME CARD -->
+<div id="welcome">
+  <div class="w-top">
+    <span>ACCESS_LOG.SYS</span>
+    <button class="w-close" onclick="closeWelcome()">fechar ✕</button>
+  </div>
+  <div class="w-body">
+    <p class="w-hello" id="w-hello"></p>
+    <dl class="w-rows" id="w-rows"></dl>
+    <div class="w-foot">Detectado no seu navegador · nada é enviado a terceiros</div>
+  </div>
 </div>
 
 <!-- BACKGROUND -->
@@ -1059,7 +1155,7 @@
         </div>
       </div>
       <div id="jv-msgs">
-        <div class="jv-msg bot">Olá, eu sou o J.A.R.V.I.S., assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.</div>
+        <div class="jv-msg bot" id="jv-greeting">Olá, eu sou o J.A.R.V.I.S., assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.</div>
       </div>
       <div id="jv-suggestions">
         <button class="jv-chip" type="button" data-q="Qual é o cargo atual dele?">💼 Cargo atual</button>
@@ -1385,6 +1481,8 @@ function endBoot() {
   setTimeout(() => b.style.display = 'none', 520);
   startUptime();
   startTyping();
+  showWelcome();
+  decodeJarvisGreeting();
 }
 
 function skipBoot() {
@@ -1393,11 +1491,135 @@ function skipBoot() {
   document.getElementById('boot').style.display = 'none';
   startUptime();
   startTyping();
+  showWelcome();
+  decodeJarvisGreeting();
 }
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 runBoot();
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && booting) skipBoot(); });
+
+/* ── DECODE / SCRAMBLE TEXT EFFECT (shared) ── */
+const DECODE_SCRAMBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ01#$%&*<>/\\';
+const decodeRandChar = () => DECODE_SCRAMBLE[Math.floor(Math.random() * DECODE_SCRAMBLE.length)];
+
+function decodeReveal(text, el, opts) {
+  opts = opts || {};
+  const scrambleColor = opts.scrambleColor || 'var(--c)';
+  const charDelay = opts.charDelay || 24;
+  const scrambleTicks = opts.scrambleTicks || 5;
+  const onDone = opts.onDone;
+
+  const chars = text.split('');
+  el.innerHTML = '';
+  const spans = chars.map(ch => {
+    const s = document.createElement('span');
+    s.textContent = ch;
+    el.appendChild(s);
+    return s;
+  });
+  if (opts.cursor) {
+    const cursor = document.createElement('span');
+    cursor.className = opts.cursorClass || 'decode-cursor';
+    el.appendChild(cursor);
+  }
+  let i = 0;
+  function revealNext() {
+    if (i >= chars.length) { if (onDone) onDone(); return; }
+    const idx = i;
+    const span = spans[idx];
+    const finalCh = chars[idx];
+    if (finalCh === ' ') { i++; setTimeout(revealNext, charDelay); return; }
+    let tick = 0;
+    span.style.color = scrambleColor;
+    span.style.textShadow = '0 0 8px ' + scrambleColor;
+    const scrambleInt = setInterval(() => {
+      span.textContent = decodeRandChar();
+      tick++;
+      if (tick >= scrambleTicks) {
+        clearInterval(scrambleInt);
+        span.textContent = finalCh;
+        span.style.color = '';
+        span.style.textShadow = '';
+        i++;
+        setTimeout(revealNext, charDelay);
+      }
+    }, 22);
+  }
+  revealNext();
+}
+
+/* ── WELCOME CARD ── */
+function closeWelcome() {
+  const el = document.getElementById('welcome');
+  el.classList.remove('show');
+}
+
+function showWelcome() {
+  const ua = navigator.userAgent;
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(ua);
+  let browser = 'Desconhecido';
+  if (ua.includes('Edg/')) browser = 'Edge';
+  else if (ua.includes('OPR/') || ua.includes('Opera')) browser = 'Opera';
+  else if (ua.includes('Firefox/')) browser = 'Firefox';
+  else if (ua.includes('Chrome/')) browser = 'Chrome';
+  else if (ua.includes('Safari/')) browser = 'Safari';
+  let os = 'Desconhecido';
+  if (ua.includes('Windows')) os = 'Windows';
+  else if (ua.includes('Mac OS')) os = 'macOS';
+  else if (ua.includes('Android')) os = 'Android';
+  else if (/iPhone|iPad/.test(ua)) os = 'iOS';
+  else if (ua.includes('Linux')) os = 'Linux';
+
+  const rowsData = [
+    ['Dispositivo', os + ' · ' + (isMobile ? 'Mobile' : 'Desktop')],
+    ['Navegador', browser],
+    ['Ecrã', screen.width + '×' + screen.height + ' px'],
+    ['Idioma', navigator.language || '—'],
+  ];
+
+  const helloEl = document.getElementById('w-hello');
+  const rowsEl = document.getElementById('w-rows');
+  const card = document.getElementById('welcome');
+
+  function buildRows() {
+    rowsEl.innerHTML = '';
+    rowsData.forEach(([label, value]) => {
+      const dt = document.createElement('dt');
+      dt.textContent = label;
+      const dd = document.createElement('dd');
+      dd.textContent = value;
+      rowsEl.appendChild(dt);
+      rowsEl.appendChild(dd);
+    });
+  }
+
+  card.classList.add('show');
+  decodeReveal('Bem-vindo(a)!', helloEl, { onDone: buildRows });
+
+  setTimeout(closeWelcome, 12000);
+}
+
+/* ── J.A.R.V.I.S. GREETING DECODE ── */
+const JV_GREETING_TEXT = 'Olá, eu sou o J.A.R.V.I.S., assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.';
+
+function decodeJarvisGreeting() {
+  const el = document.getElementById('jv-greeting');
+  if (!el || el.dataset.decoded) return;
+  el.dataset.decoded = '1';
+  decodeReveal(JV_GREETING_TEXT, el, {
+    cursor: true,
+    cursorClass: 'jv-decode-cursor',
+    charDelay: 16,
+    scrambleTicks: 4,
+    onDone: () => {
+      setTimeout(() => {
+        const cur = el.querySelector('.jv-decode-cursor');
+        if (cur) cur.remove();
+      }, 2600);
+    },
+  });
+}
 
 /* ── CLOCK ── */
 function tick() {
