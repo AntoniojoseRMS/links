@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://unpkg.com; connect-src 'self' https://ipwho.is https://ntfy.sh https://api.github.com https://*.workers.dev https://unpkg.com; object-src 'none'; base-uri 'self'; form-action 'self';"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://unpkg.com; connect-src 'self' https://ipwho.is https://ntfy.sh https://api.github.com https://*.workers.dev https://unpkg.com https://api.web3forms.com; object-src 'none'; base-uri 'self'; form-action 'self';"/>
   <title>António Salvador // INFOSEC</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2057,7 +2057,9 @@ const NTFY_URL = 'https://ntfy.sh/' + NTFY_TOPIC;
   });
 })();
 
-/* ── ENVIAR RECADO (ntfy.sh) ── */
+/* ── ENVIAR RECADO (ntfy.sh push + Web3Forms e-mail) ── */
+const WEB3FORMS_ACCESS_KEY = 'REPLACE-WITH-YOUR-WEB3FORMS-ACCESS-KEY';
+
 async function sendRecado() {
   const nomeEl = document.getElementById('rc-nome');
   const msgEl = document.getElementById('rc-msg');
@@ -2077,28 +2079,42 @@ async function sendRecado() {
   statusEl.textContent = 'Enviando...';
   statusEl.style.color = 'var(--td)';
 
-  const body = [
-    `De: ${nome}`,
-    `Mensagem: ${msg}`,
-    `Hora: ${new Date().toLocaleString('pt-BR')}`,
-  ].join('\n');
+  const hora = new Date().toLocaleString('pt-BR');
+  const pushBody = [`De: ${nome}`, `Mensagem: ${msg}`, `Hora: ${hora}`].join('\n');
 
-  try {
-    await fetch(NTFY_URL, {
+  const results = await Promise.allSettled([
+    fetch(NTFY_URL, {
       method: 'POST',
-      body,
+      body: pushBody,
       headers: { 'Title': 'Novo recado de visitante', 'Tags': 'email' },
-    });
+    }),
+    WEB3FORMS_ACCESS_KEY.startsWith('REPLACE-')
+      ? Promise.reject(new Error('Web3Forms not configured'))
+      : fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_ACCESS_KEY,
+            subject: 'Novo recado no portfolio',
+            from_name: nome,
+            message: msg,
+            hora,
+          }),
+        }),
+  ]);
+
+  const pushOk = results[0].status === 'fulfilled';
+
+  if (pushOk) {
     statusEl.textContent = 'Recado enviado! Obrigado.';
     statusEl.style.color = 'var(--g)';
     msgEl.value = '';
     setTimeout(() => closeM('recado'), 1600);
-  } catch (e) {
+  } else {
     statusEl.textContent = 'Falha ao enviar. Tente novamente.';
     statusEl.style.color = 'var(--r)';
-  } finally {
-    btnEl.disabled = false;
   }
+  btnEl.disabled = false;
 }
 
 /* ── CURSOR GLOW (mouse/trackpad only) ── */
