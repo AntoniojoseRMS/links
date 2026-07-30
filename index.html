@@ -572,7 +572,7 @@
       #gname { font-size: 16px; letter-spacing: 2px; }
     }
 
-    /* ── J.A.R.V.I.S. WIDGET ── */
+    /* ── JARVIS WIDGET ── */
     @keyframes jv-glow-pulse {
       0%,100% { box-shadow: 0 0 22px rgba(0,229,255,.08), inset 0 0 40px rgba(0,0,0,.4); border-color: rgba(0,229,255,.2); }
       50%     { box-shadow: 0 0 38px rgba(0,229,255,.22), inset 0 0 40px rgba(0,0,0,.4); border-color: rgba(0,229,255,.4); }
@@ -1137,7 +1137,7 @@
     <div id="gname" data-t="ANTÓNIO SALVADOR">ANTÓNIO SALVADOR</div>
     <div id="role"></div>
 
-    <!-- J.A.R.V.I.S. WIDGET -->
+    <!-- JARVIS WIDGET -->
     <div id="jarvis" class="tilt reveal">
       <span class="jv-corner tl"></span>
       <span class="jv-corner tr"></span>
@@ -1150,12 +1150,12 @@
           <div id="jv-avatar">J</div>
         </div>
         <div>
-          <div id="jv-name">J.A.R.V.I.S.</div>
+          <div id="jv-name">JARVIS</div>
           <div id="jv-status"><span class="blink-dot"></span>Assistente virtual do António — online</div>
         </div>
       </div>
       <div id="jv-msgs">
-        <div class="jv-msg bot" id="jv-greeting">Olá, eu sou o J.A.R.V.I.S., assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.</div>
+        <div class="jv-msg bot" id="jv-greeting">Olá, eu sou o JARVIS, assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.</div>
       </div>
       <div id="jv-suggestions">
         <button class="jv-chip" type="button" data-q="Qual é o cargo atual dele?">💼 Cargo atual</button>
@@ -1165,10 +1165,10 @@
       </div>
       <div id="jv-typing" style="display:none;">
         <span class="jv-dots"><span></span><span></span><span></span></span>
-        J.A.R.V.I.S. ESTÁ PROCESSANDO
+        JARVIS ESTÁ PROCESSANDO
       </div>
       <form id="jv-form">
-        <input id="jv-input" type="text" placeholder="Pergunte algo ao J.A.R.V.I.S..." autocomplete="off" maxlength="300"/>
+        <input id="jv-input" type="text" placeholder="Pergunte algo ao JARVIS..." autocomplete="off" maxlength="300"/>
         <button type="submit" id="jv-send">➤</button>
       </form>
       <button id="jv-leave-msg" type="button" onclick="openM('recado')">📨 Deixar recado para o António</button>
@@ -1600,8 +1600,8 @@ function showWelcome() {
   setTimeout(closeWelcome, 12000);
 }
 
-/* ── J.A.R.V.I.S. GREETING DECODE ── */
-const JV_GREETING_TEXT = 'Olá, eu sou o J.A.R.V.I.S., assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.';
+/* ── JARVIS GREETING DECODE ── */
+const JV_GREETING_TEXT = 'Olá, eu sou o JARVIS, assistente virtual do António. Pergunte sobre a carreira dele, cargo atual, certificações, idiomas ou formação — ou deixe um recado para ele.';
 
 function decodeJarvisGreeting() {
   const el = document.getElementById('jv-greeting');
@@ -1986,7 +1986,7 @@ const NTFY_URL = 'https://ntfy.sh/' + NTFY_TOPIC;
   notifyVisit();
 })();
 
-/* ── J.A.R.V.I.S. CHAT (via Cloudflare Worker + Claude API) ── */
+/* ── JARVIS CHAT (via Cloudflare Worker + Claude API) ── */
 (function() {
   // Substitua pela URL do seu Worker depois de publicá-lo no Cloudflare.
   const JARVIS_WORKER_URL = 'https://jarvis-portfolio.antoniojmoraissalvador.workers.dev';
@@ -2035,7 +2035,7 @@ const NTFY_URL = 'https://ntfy.sh/' + NTFY_TOPIC;
       addMsg('bot', reply);
       history.push({ role: 'assistant', content: reply });
     } catch (e) {
-      addMsg('err', 'J.A.R.V.I.S. está indisponível no momento. Deixe um recado pelo botão abaixo ou contacte o António diretamente.');
+      addMsg('err', 'JARVIS está indisponível no momento. Deixe um recado pelo botão abaixo ou contacte o António diretamente.');
     } finally {
       setBusy(false);
       inputEl.focus();
