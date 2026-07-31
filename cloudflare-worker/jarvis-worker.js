@@ -37,6 +37,8 @@ Analista de Suporte Trilíngue Pleno — Stefanini Brasil (alocado no cliente BA
 - Graduação em Análise e Desenvolvimento de Sistemas — Estácio — 2023
 
 === CERTIFICAÇÕES ===
+- Perícia Digital, Investigação e Prevenção a Fraudes na Era da IA — IBSEC (Instituto Brasileiro de Cibersegurança) — jul/2026
+- Analista SOC na Era da IA — IBSEC (Instituto Brasileiro de Cibersegurança) — jul/2026
 - Cibersegurança para Profissionais de TI — LinkedIn Learning (Malcolm Shore) — mai/2026
 - CRPO (Certified Ransomware Protection Officer) — ICTTF – United for Digital Resilience — fev/2026
 - Introduction to Cybersecurity — Cisco — fev/2026
